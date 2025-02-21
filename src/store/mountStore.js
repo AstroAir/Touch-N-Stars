@@ -1,9 +1,11 @@
-import { defineStore } from 'pinia';
+import create from 'zustand';
 
-export const useMountStore = defineStore('mountStore', {
-  state: () => ({
-    lastDirection: '',
-    rate: 1,
-  }),
-  actions: {},
-});
+const useMountStore = create((set) => ({
+  lastDirection: '',
+  rate: 1,
+
+  setLastDirection: (direction) => set({ lastDirection: direction }),
+  setRate: (newRate) => set({ rate: newRate }),
+}));
+
+export default useMountStore;

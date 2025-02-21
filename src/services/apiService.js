@@ -1,27 +1,8 @@
 import axios from 'axios';
-import { getActivePinia } from 'pinia';
-
-let settingsStore;
-
-const initializeStore = () => {
-  if (!settingsStore) {
-    const pinia = getActivePinia();
-    if (!pinia) {
-      throw new Error('Pinia store not initialized');
-    }
-    settingsStore = pinia._s.get('settings');
-
-    // Watch for connection changes
-    settingsStore.$onAction(({ name }) => {
-      if (name === 'setConnection') {
-        // Connection changed - URLs will be regenerated on next request
-      }
-    });
-  }
-};
+import { useSettingsStore } from '../store/settingsStore';
 
 const getBaseUrl = () => {
-  initializeStore();
+  const settingsStore = useSettingsStore();
   const protocol = settingsStore.backendProtocol || 'http';
   const host = settingsStore.connection.ip || window.location.hostname;
   const port = settingsStore.connection.port || 5000;
@@ -49,7 +30,6 @@ const apiService = {
     try {
       const { BASE_URL } = getUrls();
       const response = await axios.get(`${BASE_URL}/version`);
-      //console.log(response.data);
       return response.data;
     } catch (error) {
       console.error('Error reaching backend:', error.message);
@@ -188,7 +168,6 @@ const apiService = {
           newValue,
         },
       });
-      //console.log(response.data);
       return response.data;
     } catch (error) {
       console.error('Error switch profil:', error);
@@ -231,7 +210,6 @@ const apiService = {
   },
 
   async startCapture(duration, gain, solve = false) {
-    console.log('Zeit:', duration, 'Gain: ', gain);
     try {
       const { BASE_URL } = getUrls();
       const response = await axios.get(`${BASE_URL}/equipment/camera/capture`, {
@@ -649,7 +627,6 @@ const apiService = {
   },
 
   async guiderStart(calibrate) {
-    //calibrate = true or false
     try {
       const { BASE_URL } = getUrls();
       const response = await axios.get(`${BASE_URL}/equipment/guider/start`, {
