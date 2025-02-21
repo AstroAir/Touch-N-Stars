@@ -21,10 +21,15 @@ Die Anwendung soll die Steuerung und Anpassung bereits konfigurierter Profile er
 - Es muss das [Plugin](https://github.com/Touch-N-Stars/N.I.N.A-Plugin-for-Touch-N-Stars) in NINA installiert werden
 - Wahrscheinlich muss die Windowsfirewall für die Anwendung freigegeben werden.
 - Anschließend ist Touch'N'Stars über http://"IP-von-NINA-PC":5000 erreichbar.
-  
+
 ### 📱 **Android App**
 - Für Android-Nutzer haben wir eine App erstellt.
 - Die [APK-Datei](https://github.com/Touch-N-Stars/Touch-N-Stars/releases) muss einfach auf dem Smartphone oder Tablet installiert werden.
+
+### 📱 **iOS App**
+- Für iOS-Nutzer haben wir aktuell noch keine App. 
+Die Hürden, die Apple hier aufbaut, sind sehr groß, und ich bin noch unsicher, ob ich so diesen Konzern unterstützen will.
+- Es funktioniert aber auch ohne native App, ganz einfach im Browser auf jedem iOS-Gerät.
 
 ### 🧪 **Was bietet die akutelle Version?**  
 - **Mobile Bedienbarkeit**: Greife einfach über dein Smartphone oder Tablet auf NINA zu.  
@@ -34,3 +39,7 @@ Die Anwendung soll die Steuerung und Anpassung bereits konfigurierter Profile er
 ### 💙 **Dank**  
 Mein Dank gilt dem gesamten Entwicklerteam von **NINA**, deren großartige Arbeit diese WebApp erst möglich macht.  
 Ein besonderes Dankeschön an **Christian**, den Entwickler der **Advanced API**, für seine Bemühungen und Unterstützung. Seine Arbeit hat die Entwicklung dieser WebApp maßgeblich ermöglicht.
+
+### 🔍 Weitere Informationen
+- Mehr Details zur Anwendung und zur Nutzung findest du in unserem [WIKI](https://github.com/Touch-N-Stars/Touch-N-Stars/releases](https://github.com/Touch-N-Stars/Touch-N-Stars/wiki/Touch'N'Stars-Wiki)).
+- Auf unserem  [YouTube-Kanal](https://www.youtube.com/watch?v=0chtlhO_cX4&list=PLAT-Qw0mxhRLn1KzFKGRuu3Pur-gjNS2C) gibt es Videoanleitungen und weitere Tipps zur Nutzung von Touch'N'Stars

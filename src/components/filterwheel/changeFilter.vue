@@ -9,7 +9,7 @@
         id="filter"
         v-model.number="store.filterNr"
         @change="changeFilter"
-        class="w-28 text-black px-3 h-8 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-700"
+        class="text-black px-3 h-8 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-700"
       >
         <!-- Option für 'Unbekannt' hinzufügen -->
         <option :value="null" disabled>{{ $t('components.filterwheel.unknown') }}</option>

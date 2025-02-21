@@ -1,7 +1,43 @@
 <template>
   <div class="p-4">
     <!-- Tabelle anzeigen, wenn Daten verfügbar sind -->
-    <div class="w-full overflow-x-auto">
+    <div class="w-full overflow-x-auto relative">
+      <button
+        @click="downloadLogs"
+        class="absolute top-0 right-0 p-2 hover:bg-gray-700 rounded-lg"
+        :title="$t('components.lastLogs.download')"
+      >
+        <!-- Success indicator -->
+        <div
+          v-if="showSuccess"
+          class="absolute -top-1 -right-1 z-10 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center animate-fade-out opacity-0 pointer-events-none"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-4 w-4 text-white"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="3"
+          >
+            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+          </svg>
+        </div>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-5 w-5 text-gray-300"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+          />
+        </svg>
+      </button>
       <table
         class="w-full table-fixed border-collapse border border-gray-800 text-gray-300 text-sm"
       >
@@ -44,8 +80,13 @@
 </template>
 
 <script setup>
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { useLogStore } from '@/store/logStore';
+const showSuccess = ref(false);
+import { Filesystem, Directory } from '@capacitor/filesystem';
+import { FilePicker } from '@capawesome/capacitor-file-picker';
+import { Capacitor } from '@capacitor/core';
+import { saveAs } from 'file-saver';
 const logStore = useLogStore();
 
 // Funktion zum Formatieren des Timestamps (optional)
@@ -54,10 +95,75 @@ function formatTimestamp(timestamp) {
   return date.toLocaleString();
 }
 
-// Computed Property für gefilterte Logs
 const filteredLogs = computed(() =>
   logStore.LogsInfo.logs.filter((entry) => !entry.message.includes('EDS_ERR_INVALID_PARAMETER'))
 );
+
+async function downloadLogs() {
+  const logContent = filteredLogs.value
+    .map((entry) => `[${formatTimestamp(entry.timestamp)}] ${entry.level}: ${entry.message}`)
+    .join('\n');
+
+  const fileName = `logs-${new Date().toISOString().slice(0, 10)}.log`;
+
+  // Platform detection for native Android vs web
+  if (Capacitor.getPlatform() === 'android') {
+    // Let user choose directory
+    try {
+      const dirResult = await FilePicker.pickDirectory();
+      if (!dirResult.path) return;
+
+      // Extract clean path from URI and ensure directory exists
+      const cleanPath = dirResult.path.replace(/content:\/\/.*?\/tree\/primary%3A/, '');
+      const decodedPath = decodeURIComponent(cleanPath).replace(/:/, '/');
+
+      try {
+        await Filesystem.mkdir({
+          path: decodedPath,
+          directory: Directory.ExternalStorage,
+          recursive: true,
+        });
+      } catch (mkdirError) {
+        if (mkdirError.message !== 'Directory exists') {
+          throw mkdirError;
+        }
+      }
+
+      await Filesystem.writeFile({
+        path: `${decodedPath}/${fileName}`,
+        data: logContent,
+        directory: Directory.ExternalStorage,
+        encoding: 'utf8',
+        recursive: true,
+        exists: true,
+      });
+
+      console.log('Log file saved successfully');
+      showSuccess.value = true;
+      setTimeout(() => (showSuccess.value = false), 2000);
+    } catch (error) {
+      console.error('Error saving log file:', error);
+    }
+  } else {
+    // Web browser fallback using file-saver
+    const blob = new Blob([logContent], { type: 'text/plain;charset=utf-8' });
+    saveAs(blob, fileName);
+    showSuccess.value = true;
+    setTimeout(() => (showSuccess.value = false), 2000);
+  }
+}
 </script>
 
-<style scoped></style>
+<style scoped>
+@keyframes fade-out {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+.animate-fade-out {
+  animation: fade-out 1s ease-in forwards;
+}
+</style>

@@ -1,6 +1,11 @@
 <template>
   <div>
-    <canvas ref="rmsGraph"></canvas>
+    <div>
+      <canvas ref="rmsGraph"></canvas>
+    </div>
+    <div class="note">
+      {{ $t('components.guider.notes') }}
+    </div>
   </div>
 </template>
 
@@ -95,5 +100,12 @@ onBeforeUnmount(() => {
 canvas {
   max-width: 100%;
   height: 200px;
+}
+
+.note {
+  font-size: 0.8em;
+  color: #666;
+  margin-top: 8px;
+  font-style: italic;
 }
 </style>

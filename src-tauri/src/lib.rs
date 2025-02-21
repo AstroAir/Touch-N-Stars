@@ -2,7 +2,7 @@
 pub fn run() {
   tauri::Builder::default()
     .setup(|app| {
-      app.handle().plugin(tauri_plugin_geolocation::init())?;
+      //app.handle().plugin(tauri_plugin_geolocation::init())?;
       
       if cfg!(debug_assertions) {
         app.handle().plugin(

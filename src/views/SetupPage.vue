@@ -22,6 +22,7 @@
         @before-enter="beforeEnter"
         @after-enter="afterEnter"
       >
+        <!-- Step 1: Welcome -->
         <div
           v-if="currentStep === 1"
           key="welcome"
@@ -41,6 +42,7 @@
           </button>
         </div>
 
+        <!-- Step 2: Language Selection -->
         <div
           v-else-if="currentStep === 2"
           key="language"
@@ -76,11 +78,8 @@
           </div>
         </div>
 
-        <div
-          v-else-if="currentStep === 3 && isTauri"
-          key="gps"
-          class="bg-gray-800 p-8 rounded-lg shadow-lg"
-        >
+        <!-- Step 3: GPS Configuration (using Capacitor Geolocation) -->
+        <div v-else-if="currentStep === 3" key="gps" class="bg-gray-800 p-8 rounded-lg shadow-lg">
           <h2 class="text-2xl font-bold text-white mb-6">{{ t('setup.gpsConfiguration') }}</h2>
           <div class="space-y-4">
             <div class="flex items-center gap-2">
@@ -125,8 +124,9 @@
           </div>
         </div>
 
+        <!-- Step 4: Instance Configuration -->
         <div
-          v-else-if="currentStep === 4 && isTauri"
+          v-else-if="currentStep === 4"
           key="instance"
           class="bg-gray-800 p-8 rounded-lg shadow-lg"
         >
@@ -178,6 +178,7 @@
           </div>
         </div>
 
+        <!-- Final Step: Complete Setup -->
         <div v-else key="complete" class="bg-gray-800 p-8 rounded-lg shadow-lg">
           <h2 class="text-2xl font-bold text-white mb-6">{{ t('setup.completeSetup') }}</h2>
           <button
@@ -198,6 +199,7 @@ import { useI18n } from 'vue-i18n';
 import { getAvailableLanguages } from '@/i18n';
 import { useRouter } from 'vue-router';
 import { useSettingsStore } from '@/store/settingsStore';
+import { Geolocation } from '@capacitor/geolocation';
 
 const { locale, t } = useI18n();
 const router = useRouter();
@@ -218,8 +220,9 @@ function afterEnter() {
 const selectedLanguage = ref(locale.value);
 const latitude = ref('');
 const longitude = ref('');
+const altitude = ref('');
 const gpsError = ref(null);
-const isTauri = ref(window.__TAURI__ !== undefined);
+
 const instanceName = ref('');
 const instanceIP = ref('');
 const instancePort = ref('');
@@ -233,34 +236,26 @@ function saveLanguage() {
 }
 
 async function getCurrentLocation() {
-  if (!isTauri.value) {
-    gpsError.value = 'GPS only available in Tauri builds';
-    return;
-  }
-
   try {
-    const { checkPermissions, requestPermissions, getCurrentPosition } = await import(
-      '@tauri-apps/plugin-geolocation'
-    );
-
-    let permissions = await checkPermissions();
-    if (permissions.location === 'prompt' || permissions.location === 'prompt-with-rationale') {
-      permissions = await requestPermissions(['location']);
+    // Check for location permission
+    const status = await Geolocation.checkPermissions();
+    if (status.location !== 'granted') {
+      const result = await Geolocation.requestPermissions();
+      if (result.location !== 'granted') {
+        gpsError.value = 'Location permission not granted';
+        return;
+      }
     }
-
-    if (permissions.location === 'granted') {
-      const pos = await getCurrentPosition({
-        enableHighAccuracy: true,
-        timeout: 10000,
-        maximumAge: 0,
-      });
-
-      latitude.value = pos.coords.latitude.toFixed(6);
-      longitude.value = pos.coords.longitude.toFixed(6);
-      gpsError.value = null;
-    } else {
-      gpsError.value = 'Location permission not granted';
-    }
+    // Get current position with high accuracy
+    const pos = await Geolocation.getCurrentPosition({
+      enableHighAccuracy: true,
+      timeout: 10000,
+      maximumAge: 0,
+    });
+    latitude.value = pos.coords.latitude.toFixed(6);
+    longitude.value = pos.coords.longitude.toFixed(6);
+    altitude.value = pos.coords.altitude;
+    gpsError.value = null;
   } catch (error) {
     gpsError.value = error.message || 'Failed to get GPS location';
   }
@@ -270,12 +265,13 @@ function saveGPS() {
   settingsStore.setCoordinates({
     latitude: latitude.value,
     longitude: longitude.value,
+    altitude: altitude.value,
   });
   currentStep.value++;
 }
 
 function saveInstance() {
-  // Validate Nina connection details
+  // Validate instance connection details
   if (!instanceName.value.trim()) {
     alert(t('components.settings.errors.instanceNameRequired'));
     return;

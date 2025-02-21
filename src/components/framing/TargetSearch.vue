@@ -31,6 +31,23 @@
           </li>
         </ul>
       </div>
+      <!-- Star Selection Dropdown -->
+      <div class="mb-4 mt-4">
+        <label for="visibleStars" class="block text-white font-bold text-xl mb-4">{{
+          $t('components.slewAndCenter.visibleStars')
+        }}</label>
+        <select
+          id="visibleStars"
+          v-model="selectedStar"
+          class="text-black w-full p-2 border border-gray-300 rounded"
+          @change="updateRaDec"
+        >
+          <option v-for="star in visibleStars" :key="star.name" :value="star">
+            {{ star.name }} (Mag: {{ star.magnitude }}) - Alt: {{ star.altAz.alt.toFixed(1) }}°, Az:
+            {{ star.altAz.az.toFixed(1) }}° ({{ star.altAz.direction }})
+          </option>
+        </select>
+      </div>
       <div class="flex min-w-36 items-center border border-gray-500 p-1 mt-2 rounded-lg">
         <label for="DewHeater" class="text-sm mb-1 text-gray-400"
           >{{ $t('components.framing.useNinaCache') }}
@@ -45,23 +62,25 @@
         v-if="framingStore.selectedItem"
         class="grid grid-cols-2 mt-4 p-4 border border-gray-700 rounded shadow"
       >
-        <div class="text-xs">
-          <p v-if="framingStore.selectedItem['Common names']">
-            <strong>Name:</strong> {{ framingStore.selectedItem['Common names'] }}
-          </p>
-          <p><strong>NGC:</strong> {{ framingStore.selectedItem.Name }}</p>
-          <p v-if="framingStore.selectedItem.M">
-            <strong>M:</strong> M{{ framingStore.selectedItem.M }}
-          </p>
+        <div flex flex-col justify-between>
+          <div class="text-xs">
+            <p v-if="framingStore.selectedItem['Common names']">
+              <strong>Name:</strong> {{ framingStore.selectedItem['Common names'] }}
+            </p>
+            <p>{{ framingStore.selectedItem.Name }}</p>
+            <p v-if="framingStore.selectedItem.M">
+              {{ framingStore.selectedItem.M }}
+            </p>
+          </div>
         </div>
         <div>
           <TargetPic class="border border-gray-500 rounded-md" />
         </div>
       </div>
-      <div v-if="false" class="mb-2 mt-1">
+      <div v-if="true" class="mb-2 mt-1">
         <button
-          v-if="framingStore.selectedItem"
-          @click="showFramingModal = true"
+          v-if="framingStore.selectedItem && true"
+          @click="framingStore.showFramingModal = true"
           class="default-button-cyan"
         >
           {{ $t('components.framing.openFraminingModal') }}
@@ -76,15 +95,16 @@
     </div>
     <!-- Framing Modal -->
     <div
-      v-if="showFramingModal"
+      v-if="framingStore.showFramingModal"
       class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
     >
       <div
-        class="bg-gray-900 rounded-lg p-4 overflow-y-auto max-h-[90vh] pr-3 scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-800/50"
+        class="bg-gray-900 rounded-lg p-4 overflow-y-auto max-h-[95vh] border border-gray-700 scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-800/50"
+        :style="{ minWidth: `${framingStore.containerSize}px` }"
       >
         <FramingAssistangModal />
         <button
-          @click="showFramingModal = false"
+          @click="framingStore.showFramingModal = false"
           class="fixed sm:absolute top-2 right-2 sm:top-4 sm:right-4 p-2 text-gray-400 hover:text-white bg-gray-900 rounded-full"
         >
           <svg
@@ -113,11 +133,35 @@ import slewAndCenter from '@/components/framing/slewAndCenter.vue';
 import TargetPic from '@/components/framing/TargetPic.vue';
 import controlUseNinaCache from '@/components/framing/controlUseNinaCache.vue';
 import { useFramingStore } from '@/store/framingStore';
-import { onMounted, ref } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import FramingAssistangModal from '@/components/framing/FramingAssistangModal.vue';
+import Papa from 'papaparse';
+import { useSettingsStore } from '@/store/settingsStore';
 
 const framingStore = useFramingStore();
-const showFramingModal = ref(false);
+const settingsStore = useSettingsStore();
+const stars = ref([]);
+const selectedStar = ref(null);
+const currentSiderealTime = ref(0);
+
+// Computed property to filter visible stars and calculate Alt/Az
+const visibleStars = computed(() => {
+  return stars.value
+    .map((star) => {
+      const altAz = calculateAltAz(star.raDeg, star.decDeg);
+      return {
+        ...star,
+        altAz,
+      };
+    })
+    .filter((star) => star.altAz.alt > 0)
+    .sort((a, b) => {
+      const altA = parseFloat(a.altAz.alt);
+      const altB = parseFloat(b.altAz.alt);
+      return altB - altA; // Sort by altitude in descending order
+    });
+});
+
 async function fetchTargetSearch() {
   if (framingStore.searchQuery.trim() === '') {
     framingStore.targetSearchResult = [];
@@ -127,7 +171,6 @@ async function fetchTargetSearch() {
     const data = await apiService.searchNGC(framingStore.searchQuery, 10);
     if (Array.isArray(data)) {
       framingStore.targetSearchResult = data;
-      console.log('Suche: ', data);
     } else {
       console.warn("Die API hat kein Array zurückgegeben, 'targetSearchResult' wird geleert.");
       framingStore.targetSearchResult = [];
@@ -146,68 +189,187 @@ function selectTarget(item) {
   framingStore.DECangle = item.Dec;
   framingStore.RAangleString = degreesToHMS(item.RA);
   framingStore.DECangleString = degreesToDMS(item.Dec);
-
-  console.log('item', framingStore.selectedItem);
 }
 
 function degreesToHMS(deg) {
-  // Schritt 1: Grad in Stunden umrechnen
   const totalHours = deg / 15;
-
-  // Ganze Stunden ermitteln
   const h = Math.floor(totalHours);
-
-  // Schritt 2: Minuten
   const remainingHours = totalHours - h;
   const totalMinutes = remainingHours * 60;
   const m = Math.floor(totalMinutes);
-
-  // Schritt 3: Sekunden
   const remainingMinutes = totalMinutes - m;
   const s = remainingMinutes * 60;
 
-  // Formatierung (z. B. auf eine Nachkommastelle)
-  const hStr = String(h).padStart(1, '0'); // Stunden dürfen ruhig einstellig bleiben
-  const mStr = String(m).padStart(2, '0'); // Minuten zweistellig
-  const sStr = s.toFixed(1).padStart(4, '0'); // Sekunden mit einer Nachkommastelle
+  const hStr = String(h).padStart(2, '0');
+  const mStr = String(m).padStart(2, '0');
+  const sStr = s.toFixed(1).padStart(4, '0');
 
   return `${hStr}:${mStr}:${sStr}`;
 }
+
 function degreesToDMS(deg) {
-  console.log('degreesToDMS ', deg);
-  // 1) Vorzeichen merken und Absolutwert nehmen
   const sign = deg < 0 ? '-' : '+';
   deg = Math.abs(deg);
-
-  // 2) Ganze Grad
   const d = Math.floor(deg);
-
-  // 3) Minuten
   const remainingDeg = deg - d;
   const totalMinutes = remainingDeg * 60;
   const m = Math.floor(totalMinutes);
-
-  // 4) Sekunden
   const remainingMinutes = totalMinutes - m;
   const s = remainingMinutes * 60;
 
-  // 5) Formatierung
-  //    a) Grad: max. zwei Ziffern, da DEC zwischen -90° und +90° liegt
-  //    b) Minuten/Sekunden: jeweils zweistellig
   const dStr = String(d).padStart(2, '0');
   const mStr = String(m).padStart(2, '0');
-  // Auf eine Nachkommastelle runden, z. B. 0.1"
   const sStr = s.toFixed(1).padStart(4, '0');
 
-  // 6) Zusammenbauen: ±DD:MM:SS.s
   return `${sign}${dStr}:${mStr}:${sStr}`;
 }
 
-onMounted(() => {
+onMounted(async () => {
   framingStore.height = 200;
   framingStore.width = 200;
   framingStore.fov = 2;
+  await loadStarData();
+  updateSiderealTime();
+  setInterval(updateSiderealTime, 1000);
+
+  const smallerDimension = Math.min(window.innerWidth, window.innerHeight - 200);
+  const roundedDimension = Math.floor(smallerDimension / 100) * 100;
+  framingStore.containerSize = roundedDimension;
 });
+
+async function loadStarData() {
+  try {
+    const response = await fetch('/stars.csv');
+    const csvData = await response.text();
+
+    Papa.parse(csvData, {
+      header: true,
+      skipEmptyLines: true,
+      complete: (results) => {
+        stars.value = results.data.map((star) => {
+          const raDeg = convertRAtoDegrees(star.ra);
+          const decDeg = convertDECtoDegrees(star.dec);
+          return {
+            name: star.name,
+            magnitude: parseFloat(star.magnitude),
+            ra: star.ra, // Keep original RA format
+            dec: star.dec, // Keep original Dec format
+            raDeg: raDeg,
+            decDeg: decDeg,
+          };
+        });
+      },
+    });
+  } catch (error) {
+    console.error('Error loading star data:', error);
+  }
+}
+
+function convertRAtoDegrees(ra) {
+  const matches = ra.match(/(\d+)h\s*(\d+)m\s*([\d.]+)s/);
+  if (!matches) return 0;
+  return (
+    15 *
+    ((parseInt(matches[1]) || 0) +
+      (parseInt(matches[2]) || 0) / 60 +
+      (parseFloat(matches[3]) || 0) / 3600)
+  );
+}
+
+function convertDECtoDegrees(dec) {
+  const matches = dec.match(/([+-]?)(\d+)°\s*(\d+)′\s*([\d.]+)″/);
+  if (!matches) return 0;
+  const sign = matches[1] === '-' ? -1 : 1;
+  return (
+    sign *
+    ((parseInt(matches[2]) || 0) +
+      (parseInt(matches[3]) || 0) / 60 +
+      (parseFloat(matches[4]) || 0) / 3600)
+  );
+}
+
+// New function to calculate Altitude and Azimuth
+function calculateAltAz(raDeg, decDeg) {
+  const latRad = (settingsStore.coordinates.latitude * Math.PI) / 180;
+  const decRad = (decDeg * Math.PI) / 180;
+  const now = new Date();
+  const JD = now / 86400000 - now.getTimezoneOffset() / 1440 + 2440587.5;
+  const GMST = 18.697374558 + 24.06570982441908 * (JD - 2451545.0);
+  const LMST = (GMST + settingsStore.coordinates.longitude / 15) % 24;
+  const hourAngle = LMST * 15 - raDeg;
+  const haRad = (hourAngle * Math.PI) / 180;
+
+  const altRad = Math.asin(
+    Math.sin(decRad) * Math.sin(latRad) + Math.cos(decRad) * Math.cos(latRad) * Math.cos(haRad)
+  );
+  const alt = (altRad * 180) / Math.PI;
+
+  const azRad = Math.atan2(
+    -Math.cos(decRad) * Math.cos(latRad) * Math.sin(haRad),
+    Math.sin(decRad) * Math.cos(latRad) - Math.cos(decRad) * Math.sin(latRad) * Math.cos(haRad)
+  );
+  let az = (azRad * 180) / Math.PI;
+  if (az < 0) {
+    az += 360;
+  }
+  const direction = getDirection(az);
+
+  return { alt: alt, az: az, direction: direction };
+}
+
+function getDirection(az) {
+  if (az >= 337.5 || az < 22.5) {
+    return 'N';
+  } else if (az >= 22.5 && az < 67.5) {
+    return 'NE';
+  } else if (az >= 67.5 && az < 112.5) {
+    return 'E';
+  } else if (az >= 112.5 && az < 157.5) {
+    return 'SE';
+  } else if (az >= 157.5 && az < 202.5) {
+    return 'S';
+  } else if (az >= 202.5 && az < 247.5) {
+    return 'SW';
+  } else if (az >= 247.5 && az < 292.5) {
+    return 'W';
+  } else {
+    return 'NW';
+  }
+}
+
+function updateSiderealTime() {
+  const now = new Date();
+  const JD = now / 86400000 - now.getTimezoneOffset() / 1440 + 2440587.5;
+  const GMST = 18.697374558 + 24.06570982441908 * (JD - 2451545.0);
+  currentSiderealTime.value = (GMST % 24) * 15 + settingsStore.coordinates.longitude / 15;
+}
+
+async function updateRaDec() {
+  if (selectedStar.value) {
+    // Get the formatted values
+    const formattedRA = degreesToHMS(selectedStar.value.raDeg);
+    const formattedDEC = degreesToDMS(selectedStar.value.decDeg);
+
+    // Update the store with the formatted values
+    framingStore.RAangleString = formattedRA;
+    framingStore.DECangleString = formattedDEC;
+
+    // Update store with the numeric values (this part is already correct)
+    framingStore.RAangle = selectedStar.value.raDeg;
+    framingStore.DECangle = selectedStar.value.decDeg;
+    framingStore.selectedItem = {
+      Name: selectedStar.value.name,
+      RA: selectedStar.value.raDeg,
+      Dec: selectedStar.value.decDeg,
+    };
+    try {
+      await apiService.setFramingImageSource('SKYATLAS');
+      await apiService.setFramingCoordinates(selectedStar.value.raDeg, selectedStar.value.decDeg);
+    } catch (error) {
+      console.error('Error updating sky atlas:', error);
+    }
+  }
+}
 </script>
 
 <style scoped></style>

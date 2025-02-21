@@ -1,22 +1,22 @@
 <template>
   <toggleButton
     @click="toggleNinaCache"
-    :status-value="framingStore.useNinaCache"
+    :status-value="settingsStore.framing.useNinaCache"
     class="pr-5 pl-5 justify-center"
   />
 </template>
 <script setup>
-import { useFramingStore } from '@/store/framingStore';
+import { useSettingsStore } from '@/store/settingsStore';
 import toggleButton from '@/components/helpers/toggleButton.vue';
 
-const framingStore = useFramingStore();
+const settingsStore = useSettingsStore();
 
 function toggleNinaCache() {
-  if (framingStore.useNinaCache) {
-    framingStore.useNinaCache = false;
+  if (settingsStore.framing.useNinaCache) {
+    settingsStore.framing.useNinaCache = false;
     console.log('Hipps nutzen');
   } else {
-    framingStore.useNinaCache = true;
+    settingsStore.framing.useNinaCache = true;
     console.log('cache nutzen');
   }
 }

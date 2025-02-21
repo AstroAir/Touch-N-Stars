@@ -43,11 +43,21 @@
       {{ $t('components.mount.control.stop') }}
     </button>
   </div>
+
+  <div class="flex mt-4 justify-center items-center">
+    <div class="w-3 mr-2 h-[1px] bg-gray-700"></div>
+    <p class="text-xs">{{ $t('components.mount.control.manuellControl') }}</p>
+    <div class="flex-grow ml-2 h-[1px] bg-gray-700"></div>
+  </div>
+  <div>
+    <moveAxis v-if="false" />
+  </div>
 </template>
 
 <script setup>
 import apiService from '@/services/apiService';
 import { useI18n } from 'vue-i18n';
+import moveAxis from '@/components/mount/moveAxis.vue';
 
 const { t } = useI18n();
 

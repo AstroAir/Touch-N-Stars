@@ -134,7 +134,7 @@
               class="icon"
               :class="[
                 'icon',
-                store.flatdeviceInfo.CoverState === 2
+                store.flatdeviceInfo.CoverState === 'Closed'
                   ? 'text-red-500'
                   : store.flatdeviceInfo.LightOn
                     ? 'text-yellow-300'
@@ -236,6 +236,8 @@
       </div>
     </div>
   </div>
+
+  <exposureCountdown />
 </template>
 
 <script setup>
@@ -249,7 +251,7 @@ import {
   AdjustmentsVerticalIcon,
 } from '@heroicons/vue/24/outline';
 import { apiStore } from '@/store/store';
-
+import exposureCountdown from '@/components/helpers/ExposureCountdown.vue';
 const store = apiStore();
 </script>
 

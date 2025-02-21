@@ -16,8 +16,9 @@
   },
   "app": {
     "title": "Touch'N'Stars",
-    "unreachable": "NINA-API ist nicht erreichbar oder die Version ist zu alt",
-    "connecting": "Versuche Verbindung herzustellen"
+    "unreachable": "NINA-API ist nicht erreichbar",
+    "connecting": "Versuche Verbindung herzustellen",
+    "api_version_incompatible": "Advanced-API-Version Inkompatibel Aktuell: {current} Erforderlich: {required}"
   },
   "setup": {
     "welcome": "Willkommen bei Touch'N'Stars",
@@ -54,7 +55,18 @@
         "invalidIPFormat": "Bitte geben Sie IP oder FQDN an",
         "invalidPortRange": "Port muss zwischen 1 und 65535 liegen"
       },
-      "showTutorial": "Tutorial anzeigen"
+      "showTutorial": "Tutorial anzeigen",
+      "system": {
+        "description": "Klicken Sie auf ein Symbol, um das System neu zu starten oder herunterzufahren",
+        "title": "Systemsteuerungen",
+        "confirmRestart": "Sind Sie sicher, dass Sie das System neu starten möchten?",
+        "confirmShutdown": "Sind Sie sicher, dass Sie das System herunterfahren möchten?",
+        "confirmation": "Bestätigung"
+      },
+      "image": {
+        "title": "Bildeinstellungen",
+        "quality": "Qualität in % "
+      }
     },
     "framing": {
       "confirmSetTargetTitle": "Zielauswahl bestätigen",
@@ -67,12 +79,16 @@
       },
       "openFraminingModal": "Im Framing-Assistant öffnen",
       "fovSettings": {
-        "fov": "Field of View",
-        "focalLengthM": "Brennweite (mm)",
-        "pixelSizeM": "Kamerapixelgröße (µm)",
-        "sensorHeightPx": "Kamerasensor Höhe (px)",
-        "sensorWidthPx": "Kamerasensor Breite (px)"
-      }
+        "rotationAngle": "Kameradrehung",
+        "fov": "Field of View"
+      },
+      "getImageRotation": {
+        "startCapture": "Drehung der Kamera bestimmen",
+        "SolveRun": "Platesolve",
+        "SolveError": "Fehler beim Platesolve"
+      },
+      "moveRotator": "Camera rotieren",
+      "infoTargetImage": "Wenn das Bild nur in Schwarz angezeigt wird, muss der 'Offline Sky Map Cache' in NINA eingerichtet oder die Option 'NINA cache' deaktiviert werden"
     },
     "connectEquipment": {
       "camera": {
@@ -142,7 +158,8 @@
       "level": "Level",
       "message": "Nachricht",
       "member": "Mitglied",
-      "line": "Zeile"
+      "line": "Zeile",
+      "download": "Herunterladen"
     },
     "navigation": {
       "equipment": "Geräte",
@@ -156,9 +173,6 @@
       "vnc": "VNC"
     },
     "language": {
-      "en": "Englisch",
-      "de": "Deutsch",
-      "fr": "Französisch",
       "select": "Sprache auswählen"
     },
     "equipment": {
@@ -217,6 +231,8 @@
         "unpark": "Ausparken",
         "home": "Home",
         "trackingMode": "Nachführungsmodus",
+        "manuellControl": "Manuelle Bedienung",
+        "slewRate": "Bewegungsrate °/s",
         "siderial": "Siderisch",
         "lunar": "Lunar",
         "solar": "Solar",
@@ -245,7 +261,9 @@
       "startWithCal": "Starten mit Kalibrierung",
       "stop": "Stopp",
       "rms_error": "RMS-Fehler",
-      "title": "Guider"
+      "title": "Guider",
+      "running": "WIRD AUSGEFÜHRT",
+      "notes": "* In diesem Diagramm werden Guiderdaten gemäß den Einstellungen von N.I.N.A. angezeigt."
     },
     "focuser": {
       "title": "Fokussierer",
@@ -316,7 +334,10 @@
       "camera_cooling": "Kamerakühlung",
       "target_temperature": "Zieltemperatur",
       "warm_up_time": "Aufwärmzeit",
-      "cooling_time": "Kühlzeit"
+      "cooling_time": "Kühlzeit",
+      "binning_mode": "Binning",
+      "readout_mode": "Readout Mode",
+      "set_use_platesolve": "Use Platesolve"
     },
     "tppa": {
       "title": "Drei-Punkt-Polarausrichtung",
@@ -345,14 +366,15 @@
     },
     "loading": "Laden...",
     "slewAndCenter": {
-      "title": "Schwenken und Zentrieren",
+      "title": "Schwenken und zentrieren",
       "LastSelectedImageSource_wrong": "Bitte offline Himmelskarte als Bildquelle in NINA / Framing auswählen",
       "ra": "RA:",
       "dec": "Dec:",
       "ra_placeholder": "RA 03:47:28.2",
       "dec_placeholder": "Dec +24:06:19",
       "slew": "Schwenken",
-      "slew_and_center": "Schwenken und Zentrieren",
+      "slew_and_center": "Schwenken und zentrieren",
+      "rotate": "Rotieren",
       "errors": {
         "invalidRAFormat": "Ungültiges RA-Format. Bitte verwenden Sie HH:MM:SS.",
         "invalidDECFormat": "Ungültiges DEC-Format. Bitte verwenden Sie ±DD:MM:SS.",
@@ -362,7 +384,8 @@
         "invalidFormat": "Ungültiges Format. Erwartet: ±DD:MM:SS.s",
         "apiResponseError": "Fehler in API-Antwort:",
         "mountInfoError": "Fehler beim Abrufen der Montierungsinformationen:"
-      }
+      },
+      "visibleStars": "Sichtbare Sternsuche"
     },
     "filterwheel": {
       "filter": "Filter:",
@@ -398,7 +421,11 @@
       "cloudCover": "Wolkenbedeckung",
       "wind": "Wind",
       "humidity": "Luftfeuchtigkeit",
-      "pressure": "Luftdruck"
+      "pressure": "Luftdruck",
+      "dewPoint": "Taupunkt",
+      "rainRate": "Regenrate",
+      "skyQuality": "Himmelqualität",
+      "skyTemperature": "Himmelstemperatur"
     },
     "switch": {
       "gauges": "Messwerte",

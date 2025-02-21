@@ -1,101 +1,124 @@
 <template>
-  <div class="flex items-center gap-2">
-    <div class="flex flex-col border border-gray-500 p-1 pb-2 rounded-lg">
-      <label for="exposure" class="text-xs mb-1 text-gray-400">{{
-        $t('components.camera.exposure_time')
-      }}</label>
+  <div v-if="store.cameraInfo.Connected" class="flex flex-wrap items-center gap-2">
+    <div
+      class="flex flex-row sm:flex-col w-full sm:w-auto items-center min-w-28 border border-gray-500 p-1 rounded-lg"
+    >
+      <label for="exposure" class="text-sm sm:text-xs mr-3 mb-1 text-gray-400">
+        {{ $t('components.camera.exposure_time') }}
+      </label>
       <input
         id="exposure"
-        v-model.number="cameraStore.exposureTime"
+        v-model.number="settingsStore.camera.exposureTime"
         type="number"
-        class="w-28 text-black px-3 h-8 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-700"
+        class="ml-auto text-black px-3 h-8 w-28 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-700"
         placeholder="sek"
       />
     </div>
-    <div class="flex flex-col border border-gray-500 p-1 pb-2 rounded-lg">
-      <label for="gain" class="text-xs mb-1 text-gray-400">{{
-        $t('components.camera.gain_iso')
-      }}</label>
-      <div v-if="store.cameraInfo.Gains && store.cameraInfo.Gains.length > 0">
-        <select
-          id="gain"
-          v-model.number="cameraStore.gain"
-          class="w-28 text-black px-3 h-8 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-700"
-        >
-          <option v-for="(value, key) in store.cameraInfo.Gains" :key="key" :value="key">
-            {{ value }}
-          </option>
-        </select>
-      </div>
-      <div v-else>
-        <input
-          id="gain"
-          v-model.number="cameraStore.gain"
-          type="number"
-          class="w-28 text-black px-3 h-8 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-700"
-          placeholder="1"
-        />
-      </div>
+
+    <div
+      class="flex flex-row sm:flex-col w-full sm:w-auto items-center min-w-28 border border-gray-500 p-1 rounded-lg"
+    >
+      <label for="gain" class="text-sm sm:text-xs mr-3 mb-1 text-gray-400">
+        {{ $t('components.camera.gain_iso') }}
+      </label>
+      <select
+        v-if="store.cameraInfo.Gains && store.cameraInfo.Gains.length > 0"
+        id="gain"
+        v-model.number="settingsStore.camera.gain"
+        class="ml-auto text-black px-3 h-8 w-28 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-700"
+      >
+        <option v-for="(value, key) in store.cameraInfo.Gains" :key="key" :value="value">
+          {{ value }}
+        </option>
+      </select>
+      <input
+        v-else
+        id="gain"
+        v-model.number="settingsStore.camera.gain"
+        type="number"
+        class="ml-auto text-black px-3 h-8 w-28 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-700"
+        placeholder="1"
+      />
     </div>
+
     <div
       v-if="store.cameraInfo.CanSetOffset"
-      class="flex flex-col border border-gray-500 p-1 pb-2 rounded-lg"
+      class="flex flex-row sm:flex-col w-full sm:w-auto items-center min-w-28 border border-gray-500 p-1 rounded-lg"
     >
-      <label for="offset" class="text-xs mb-1 text-gray-400">{{
-        $t('components.camera.offset')
-      }}</label>
-      <div v-if="store.cameraInfo.Offset && store.cameraInfo.Offset.length > 0">
-        <select
-          id="offset"
-          v-model.number="cameraStore.offset"
-          class="w-28 text-black px-3 h-8 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-700"
-        >
-          <option
-            v-for="(value, key) in store.cameraInfo.Offset"
-            :key="key"
-            :value="key"
-            @change="setOffset"
-          >
-            {{ value }}
-          </option>
-        </select>
-      </div>
-      <div v-else>
-        <input
-          id="offset"
-          v-model.number="cameraStore.offset"
-          type="number"
-          class="w-28 text-black px-3 h-8 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-700"
-          placeholder="0"
-          @blur="setOffset"
-          :min="store.cameraInfo.OffsetMin"
-          :max="store.cameraInfo.OffsetMax"
-        />
-      </div>
+      <label for="offset" class="text-sm sm:text-xs mr-3 mb-1 text-gray-400">
+        {{ $t('components.camera.offset') }}
+      </label>
+      <select
+        v-if="store.cameraInfo.Offset && store.cameraInfo.Offset.length > 0"
+        id="offset"
+        v-model.number="settingsStore.camera.offset"
+        @change="setOffset"
+        class="ml-auto text-black px-3 h-8 w-28 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-700"
+      >
+        <option v-for="(value, key) in store.cameraInfo.Offset" :key="key" :value="key">
+          {{ value }}
+        </option>
+      </select>
+      <input
+        v-else
+        id="offset"
+        v-model.number="settingsStore.camera.offset"
+        type="number"
+        @change="setOffset"
+        :min="store.cameraInfo.OffsetMin"
+        :max="store.cameraInfo.OffsetMax"
+        class="ml-auto text-black px-3 h-8 w-28 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-700"
+        placeholder="0"
+      />
     </div>
+    <setBinning v-if="store.cameraInfo.BinningModes.length > 1" />
+    <setReadoutMode v-if="store.cameraInfo.ReadoutModes.length > 1" />
+    <setSolve />
   </div>
 </template>
 
 <script setup>
+import { onMounted } from 'vue';
 import { apiStore } from '@/store/store';
-import { useCameraStore } from '@/store/cameraStore';
+import { useSettingsStore } from '@/store/settingsStore';
 import apiService from '@/services/apiService';
+import setBinning from '@/components/camera/setBinning.vue';
+import setReadoutMode from '@/components/camera/setReadoutMode.vue';
+import setSolve from '@/components/camera/setSolve.vue';
 
 const store = apiStore();
-const cameraStore = useCameraStore();
+const settingsStore = useSettingsStore();
+
+onMounted(() => {
+  initializeOffset();
+});
+
+// Setzt den initialen Offset
+const initializeOffset = () => {
+  if (!store.cameraInfo) {
+    console.warn('Kamera-Info nicht geladen');
+    return;
+  }
+
+  const offset = store.cameraInfo.Offset ?? 0; // Falls undefined -> Standardwert 1
+  settingsStore.camera.offset = offset;
+};
 
 async function setOffset() {
-  console.log(cameraStore.offset);
-  if (store.cameraInfo.OffsetMin > cameraStore.offset) {
-    cameraStore.offset = store.cameraInfo.OffsetMin;
+  console.log(settingsStore.camera.offset);
+  if (store.cameraInfo.OffsetMin > settingsStore.camera.offset) {
+    settingsStore.camera.offset = store.cameraInfo.OffsetMin;
     console.log('Offset zu klein min: ', store.cameraInfo.OffsetMin);
   }
-  if (store.cameraInfo.OffsetMax < cameraStore.offset) {
-    cameraStore.offset = store.cameraInfo.OffsetMax;
+  if (store.cameraInfo.OffsetMax < settingsStore.camera.offset) {
+    settingsStore.camera.offset = store.cameraInfo.OffsetMax;
     console.log('Offset zu groß, Max: ', store.cameraInfo.OffsetMax);
   }
   try {
-    const data = await apiService.profileChangeValue('CameraSettings-Offset', cameraStore.offset);
+    const data = await apiService.profileChangeValue(
+      'CameraSettings-Offset',
+      settingsStore.camera.offset
+    );
     console.log(data);
   } catch (error) {
     console.log('Fehler beim setzten des Offset');

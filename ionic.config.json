@@ -1,0 +1,7 @@
+{
+  "name": "nina-webapp",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "custom"
+}

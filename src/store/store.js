@@ -42,7 +42,9 @@ export const apiStore = defineStore('store', {
     coordinates: null,
     currentLanguage: 'en',
     showSettings: false,
-    minimumApiVersion: '2.1.4.0',
+    minimumApiVersion: '2.1.7.0',
+    currentApiVersion: null,
+    isVersionNewerOrEqual: false,
   }),
 
   actions: {
@@ -60,11 +62,47 @@ export const apiStore = defineStore('store', {
       return !!this.collapsedStates[containerName];
     },
 
+    async getGuiderInfo() {
+      try {
+        const response = await apiService.guiderAction('info');
+        if (response.Success) {
+          this.guiderInfo = response.Response;
+        }
+      } catch (error) {
+        console.error('Error fetching guider info:', error);
+      }
+    },
+
+    async getGuiderChartInfo() {
+      try {
+        const response = await apiService.guiderAction('graph');
+        if (response.Success) {
+          this.guiderChartInfo = response.Response;
+        }
+      } catch (error) {
+        console.error('Error fetching guider chart info:', error);
+      }
+    },
+
     async fetchAllInfos() {
       try {
-        this.isBackendReachable = await apiService.isBackendReachable();
-        if (!this.isVersionNewerOrEqual(this.isBackendReachable.Response, this.minimumApiVersion)) {
-          console.warn('Backend ist nicht erreichbar');
+        const versionResponse = await apiService.isBackendReachable();
+        this.isBackendReachable = !!versionResponse;
+
+        if (this.isBackendReachable) {
+          this.currentApiVersion = versionResponse.Response;
+          this.isVersionNewerOrEqual = this.checkVersionNewerOrEqual(
+            this.currentApiVersion,
+            this.minimumApiVersion
+          );
+
+          if (!this.isVersionNewerOrEqual) {
+            console.warn('API version incompatible');
+            this.clearAllStates();
+            return;
+          }
+        } else {
+          console.warn('Backend is not reachable');
           this.clearAllStates();
           return;
         }
@@ -369,6 +407,22 @@ export const apiStore = defineStore('store', {
                 apiName: apiMapping[key],
               });
             }
+          } else if (key === 'RotatorSettings') {
+            if (device.Id !== 'Manual Rotator' && device.Id !== 'No_Device') {
+              this.existingEquipmentList.push({
+                type: key,
+                id: device.Id,
+                apiName: apiMapping[key],
+              });
+            }
+          } else if (key === 'FilterWheelSettings') {
+            if (device.Id !== 'Manual Filter Wheel' && device.Id !== 'No_Device') {
+              this.existingEquipmentList.push({
+                type: key,
+                id: device.Id,
+                apiName: apiMapping[key],
+              });
+            }
           } else if (device.Id && device.Id !== 'No_Device') {
             this.existingEquipmentList.push({
               type: key,
@@ -387,16 +441,16 @@ export const apiStore = defineStore('store', {
       cStore.coolingTemp = cameraSettings.Temperature ?? -10;
       cStore.coolingTime = cameraSettings.CoolingDuration ?? 10;
       cStore.warmingTime = cameraSettings.WarmingDuration ?? 10;
-      cStore.gain = cameraSettings.Gain ?? 0;
-      cStore.buttonCoolerOn = this.cameraInfo?.CoolerOn ?? false;
-      cStore.offset = cameraSettings.Offset ?? 0;
+      // cStore.gain = cameraSettings.Gain ?? 0;
+      // cStore.buttonCoolerOn = this.cameraInfo?.CoolerOn ?? false;
+      // cStore.offset = cameraSettings.Offset ?? 0;
       console.log(
         'Kameraeinstellungen gesetzt:',
         cStore.coolingTemp,
         cStore.coolingTime,
-        cStore.warmingTime,
-        cStore.gain,
-        cStore.offset
+        cStore.warmingTime
+        //  cStore.gain,
+        // cStore.offset
       );
     },
     setDefaultRotatorSettings() {
@@ -409,20 +463,27 @@ export const apiStore = defineStore('store', {
       cStore.coordinates.latitude = this.profileInfo.AstrometrySettings.Latitude;
       cStore.coordinates.altitude = this.profileInfo.AstrometrySettings.Elevation;
     },
-    isVersionNewerOrEqual(currentVersion, minimumVersion) {
+    checkVersionNewerOrEqual(currentVersion, minimumVersion) {
       const parseVersion = (version) => version.split('.').map(Number);
 
       const currentParts = parseVersion(currentVersion);
       const minimumParts = parseVersion(minimumVersion);
 
       for (let i = 0; i < minimumParts.length; i++) {
-        const current = currentParts[i] || 0; // Standardwert: 0, falls currentVersion kürzer ist
-        const minimum = minimumParts[i] || 0; // Standardwert: 0, falls minimumVersion kürzer ist
+        const current = currentParts[i] || 0;
+        const minimum = minimumParts[i] || 0;
 
-        if (current > minimum) return true; // Neuere Version
-        if (current < minimum) return false; // Ältere Version
+        if (current > minimum) {
+          this.isVersionNewerOrEqual = true;
+          return true;
+        }
+        if (current < minimum) {
+          this.isVersionNewerOrEqual = false;
+          return false;
+        }
       }
-      return true; // Alle Teile gleich oder currentVersion ist neuer
+      this.isVersionNewerOrEqual = true;
+      return true;
     },
   },
 });

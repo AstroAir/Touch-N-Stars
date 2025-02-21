@@ -29,6 +29,22 @@ export const useSettingsStore = defineStore('settings', {
       completed: localStorage.getItem('tutorialCompleted') === 'true',
       steps: tutorialContent.steps,
     },
+    framing: {
+      useNinaCache: true,
+    },
+    mount: {
+      slewRate: 2,
+      reversePrimaryAxis: false,
+      reverseSecondaryAxis: false,
+    },
+    camera: {
+      exposureTime: 2,
+      gain: 0,
+      offset: 0,
+      useSolve: false,
+      imageScale: 100,
+      imageQuality: 90,
+    },
   }),
   actions: {
     setCoordinates(coords) {
@@ -53,7 +69,7 @@ export const useSettingsStore = defineStore('settings', {
       return this.setupCompleted;
     },
 
-    setConnection(connection) {
+    async setConnection(connection) {
       this.connection.ip = connection.ip;
       this.connection.port = connection.port;
     },
@@ -77,10 +93,18 @@ export const useSettingsStore = defineStore('settings', {
     updateInstance(id, updatedInstance) {
       const index = this.connection.instances.findIndex((i) => i.id === id);
       if (index !== -1) {
-        this.connection.instances[index] = {
+        // Merge the existing instance with updated properties
+        const mergedInstance = {
           ...this.connection.instances[index],
           ...updatedInstance,
         };
+        this.connection.instances[index] = mergedInstance;
+
+        // If the updated instance is the selected one, update connection details
+        if (this.selectedInstanceId === id) {
+          this.connection.ip = mergedInstance.ip;
+          this.connection.port = mergedInstance.port;
+        }
       }
     },
 

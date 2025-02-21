@@ -1,403 +1,435 @@
 {
-    "common": {
-      "cancel": "取消",
-      "confirm": "确认"
+  "common": {
+    "cancel": "取消",
+    "confirm": "确认"
+  },
+  "general": {
+    "cancel": "取消",
+    "confirm": "确认",
+    "hide": "隐藏",
+    "show": "显示"
+  },
+  "pages": {
+    "equipment": {
+      "title": "设备控制"
+    }
+  },
+  "app": {
+    "title": "Touch'N'Stars",
+    "unreachable": " NINA-API 无法访问",
+    "connecting": "尝试建立连接",
+    "api_version_incompatible": "高级 API 版本不兼容 当前：{ current } 必需：{ required }"
+  },
+  "setup": {
+    "welcome": "欢迎使用 Touch'N'Stars",
+    "description": "让我们开始快速设置",
+    "selectLanguage": "选择您的语言",
+    "gpsConfiguration": "GPS 配置",
+    "completeSetup": "完成设置",
+    "instanceConfiguration": "N.I.N.A 连接详情"
+  },
+  "components": {
+    "tutorial": {
+      "previous": "上一步",
+      "next": "下一步",
+      "skip": "跳过教程"
     },
-    "general": {
-      "cancel": "取消",
-      "confirm": "确认",
-      "hide": "隐藏",
-      "show": "显示"
-    },
-    "pages": {
-      "equipment": {
-        "title": "设备控制"
+    "settings": {
+      "title": "设置",
+      "language": "语言",
+      "coordinates": "GPS 坐标",
+      "connection": "N.I.N.A 连接详情",
+      "save": "保存",
+      "add": "添加",
+      "update": "更新",
+      "instance": {
+        "name": "实例名称",
+        "ip": "IP 地址",
+        "port": "端口",
+        "edit": "编辑实例",
+        "delete": "删除实例"
+      },
+      "errors": {
+        "emptyFields": "请填完所有字段",
+        "instanceNameRequired": "实例名称必填",
+        "invalidIPFormat": "请提供 IP 或 FQDN",
+        "invalidPortRange": "无效的端口范围"
+      },
+      "showTutorial": "显示教程",
+      "system": {
+        "description": "Click either icon to restart or shutdown the system",
+        "title": "System Controls",
+        "confirmRestart": "Are you sure you want to restart the system?",
+        "confirmShutdown": "Are you sure you want to shutdown the system?",
+        "confirmation": "Confirmation"
+      },
+      "image": {
+        "title": "Images settings",
+        "quality": "Quality in %"
       }
     },
-    "app": {
-      "title": "Touch'N'Stars",
-      "unreachable": "NINA-API 无法访问或版本过旧",
-      "connecting": "尝试建立连接"
+    "framing": {
+      "confirmSetTargetTitle": "确认目标选择",
+      "confirmSetTargetMessage": "您确定要将此目标设置为序列目标吗？",
+      "useNinaCache": "使用 NINA 缓存作为目标图像",
+      "setSequnceTarget": "设置为序列目标",
+      "search": {
+        "title": "搜索",
+        "placeholder": "输入搜索内容..."
+      },
+      "fovSettings": {
+        "fov": "Field of View",
+        "rotationAngle": "Camera rotation"
+      },
+      "getImageRotation": {
+        "SolveError": "Error solving image",
+        "SolveRun": "Platesolve",
+        "startCapture": "Determine rotation from camera"
+      },
+      "moveRotator": "Rotate camera",
+      "openFraminingModal": "Open in framing-assistant",
+      "infoTargetImage": "If the image is only displayed in black, the “Offline Sky Map Cache“ must be set up in NINA or the “use NINA cache” option must be deactivated"
     },
-    "setup": {
-      "welcome": "欢迎使用 Touch'N'Stars",
-      "description": "让我们开始快速设置",
-      "selectLanguage": "选择您的语言",
-      "gpsConfiguration": "GPS 配置",
-      "completeSetup": "完成设置",
-      "instanceConfiguration": "N.I.N.A 连接详情"
-    },
-    "components": {
-      "tutorial": {
-        "previous": "上一步",
-        "next": "下一步",
-        "skip": "跳过教程"
+    "connectEquipment": {
+      "camera": {
+        "connect": "连接相机",
+        "disconnect": "断开相机",
+        "error": "控制相机错误："
       },
-      "settings": {
-        "title": "设置",
-        "language": "语言",
-        "coordinates": "GPS 坐标",
-        "connection": "N.I.N.A 连接详情",
-        "save": "保存",
-        "add": "添加",
-        "update": "更新",
-        "instance": {
-          "name": "实例名称",
-          "ip": "IP 地址",
-          "port": "端口",
-          "edit": "编辑实例",
-          "delete": "删除实例"
-        },
-        "errors": {
-          "emptyFields": "请填完所有字段",
-          "instanceNameRequired": "实例名称必填",
-          "invalidIPFormat": "请提供 IP 或 FQDN",
-          "invalidPortRange": "无效的端口范围"
-        },
-        "showTutorial": "显示教程"
-      },
-      "framing": {
-        "confirmSetTargetTitle": "确认目标选择",
-        "confirmSetTargetMessage": "您确定要将此目标设置为序列目标吗？",
-        "useNinaCache": "使用 NINA 缓存作为目标图像",
-        "setSequnceTarget": "设置为序列目标",
-        "search": {
-          "title": "搜索",
-          "placeholder": "输入搜索内容..."
-        }
-      },
-      "connectEquipment": {
-        "camera": {
-          "connect": "连接相机",
-          "disconnect": "断开相机",
-          "error": "控制相机错误："
-        },
-        "connectAll": "全部连接",
-        "disconnectAll": "全部断开",
-        "connectAllError": "连接所有设备时出错",
-        "disconnectAllError": "断开所有设备时出错",
-        "filter": {
-          "connect": "连接滤镜轮",
-          "disconnect": "断开滤镜轮",
-          "error": "控制滤镜轮错误："
-        },
-        "mount": {
-          "connect": "连接赤道仪",
-          "disconnect": "断开赤道仪",
-          "error": "控制赤道仪错误："
-        },
-        "focuser": {
-          "connect": "连接调焦器",
-          "disconnect": "断开调焦器",
-          "error": "控制调焦器错误："
-        },
-        "rotator": {
-          "connect": "连接旋转器",
-          "disconnect": "断开旋转器",
-          "error": "控制旋转器错误："
-        },
-        "guider": {
-          "connect": "连接导星",
-          "disconnect": "断开导星",
-          "error": "控制导星错误："
-        },
-        "safety": {
-          "connect": "连接安全监控",
-          "disconnect": "断开安全监控",
-          "error": "控制安全监控错误"
-        },
-        "flat": {
-          "connect": "连接平场板",
-          "disconnect": "断开平场板",
-          "error": "控制平场板错误："
-        },
-        "dome": {
-          "connect": "连接穹顶",
-          "disconnect": "断开穹顶",
-          "error": "控制穹顶错误："
-        },
-        "switch": {
-          "connect": "连接开关",
-          "disconnect": "断开开关",
-          "error": "控制开关错误"
-        },
-        "weather": {
-          "connect": "连接天气设备",
-          "disconnect": "断开天气设备",
-          "error": "控制天气设备错误"
-        }
-      },
-      "lastLogs": {
-        "loading": "加载数据中...",
-        "error": "加载数据时出错：",
-        "timestamp": "时间戳",
-        "level": "级别",
-        "message": "消息",
-        "member": "成员",
-        "line": "行"
-      },
-      "navigation": {
-        "equipment": "设备",
-        "camera": "相机",
-        "autofocus": "自动对焦",
-        "mount": "赤道仪",
-        "guider": "导星",
-        "dome": "穹顶",
-        "sequence": "序列",
-        "settings": "设置",
-        "vnc": "VNC"
-      },
-      "language": {
-        "en": "英语",
-        "de": "德语",
-        "fr": "法语",
-        "es": "西班牙语",
-        "it": "意大利语",
-        "cn": "中文",
-        "select": "选择语言"
-      },
-      "equipment": {
-        "control": "设备控制"
-      },
-      "sequence": {
-        "title": "序列",
-        "stats": "统计",
-        "noSequenceLoaded": "未加载序列",
-        "noSequenceData": "尚无数据",
-        "startSequence": "开始序列",
-        "stopSequence": "停止序列",
-        "resetSequence": "重置序列",
-        "resetConfirmationTitle": "确认重置",
-        "resetConfirmationMessage": "您确定要重置序列吗？此操作无法撤销。",
-        "exposures": "曝光",
-        "exposureTime": "曝光时间",
-        "filter": "滤镜",
-        "ditherEvery": "每次抖动",
-        "type": "类型",
-        "deltaHFR": "DeltaHFR",
-        "sampleSize": "样本大小",
-        "triggers": "触发器",
-        "details": {
-          "of": "的",
-          "gain": "增益",
-          "ditherAfter": "抖动后",
-          "exposures": "曝光次数"
-        },
-        "date": "日期",
-        "hfr": "HFR",
-        "stars": "星星",
-        "mean": "平均",
-        "median": "中位数",
-        "stDev": "标准差",
-        "rmsText": "RMS",
-        "sequence_control": "序列控制",
-        "temperature": "温度",
-        "monitor": {
-          "settings": {
-            "title": "查看设置",
-            "showImage": "显示最后一张图像",
-            "showImageStats": "显示最后一张图像统计",
-            "showImgStatsGraph": "显示 HFR 图表",
-            "showGuiderGraph": "显示导星图表",
-            "showGuiderAfGraph": "显示自动对焦图表"
-          }
-        },
-        "running": "运行中"
+      "connectAll": "全部连接",
+      "disconnectAll": "全部断开",
+      "connectAllError": "连接所有设备时出错",
+      "disconnectAllError": "断开所有设备时出错",
+      "filter": {
+        "connect": "连接滤镜轮",
+        "disconnect": "断开滤镜轮",
+        "error": "控制滤镜轮错误："
       },
       "mount": {
-        "title": "赤道仪",
-        "slew": "转动",
-        "control": {
-          "park": "停靠",
-          "unpark": "解除停靠",
-          "home": "归位",
-          "trackingMode": "跟踪模式",
-          "siderial": "恒星",
-          "lunar": "月亮",
-          "solar": "太阳",
-          "king": "King",
-          "stop": "停止",
-          "errors": {
-            "park": "停靠赤道仪时出错",
-            "unpark": "解除停靠赤道仪时出错",
-            "home": "归位赤道仪时出错",
-            "tracking": "设置跟踪模式时出错"
-          }
-        },
-        "info": {
-          "notConnected": "请连接赤道仪",
-          "parked": "已停靠",
-          "unparked": "已解除停靠",
-          "trackingActive": "跟踪已激活",
-          "trackingDisabled": "跟踪已禁用",
-          "slewing": "赤道仪正在转动",
-          "notSlewing": "赤道仪未转动"
-        }
-      },
-      "guider": {
-        "notConnected": "请连接导星",
-        "start": "开始",
-        "startWithCal": "开始校准",
-        "stop": "停止",
-        "rms_error": "RMS 错误",
-        "title": "导星"
+        "connect": "连接赤道仪",
+        "disconnect": "断开赤道仪",
+        "error": "控制赤道仪错误："
       },
       "focuser": {
-        "title": "调焦器",
-        "new_position": "新位置：",
-        "move": "移动",
-        "start_autofocus": "启动自动对焦",
-        "cancel_autofocus": "取消自动对焦",
-        "autofocus_graph": "自动对焦图表",
-        "autofocus_running": "自动对焦运行中",
-        "autofocus_error": "自动对焦错误",
-        "please_connect_focuser": "请连接调焦器",
-        "current_position": "当前位置：",
-        "temperature": "温度：",
-        "moving": "移动中",
-        "stopped": "已停止",
-        "autofocus_active": "自动对焦激活中",
-        "autofocus": "自动对焦",
-        "last_autofocus": "上次自动对焦"
-      },
-      "dome": {
-        "title": "穹顶",
-        "azimuth": "方位角",
-        "slewing": "转动中",
-        "slewing_stopped": "转动已停止",
-        "following": "跟随中",
-        "following_stopped": "跟随已停止",
-        "at_home": "归位",
-        "not_at_home": "未归位",
-        "park": "停靠",
-        "unpark": "解除停靠",
-        "shutter_close": "关闭穹顶",
-        "shutter_open": "打开穹顶",
-        "control": {
-          "open": "打开穹顶",
-          "close": "关闭穹顶",
-          "stop": "停止穹顶移动",
-          "errors": {
-            "open": "打开穹顶时出错",
-            "close": "关闭穹顶时出错",
-            "stop": "停止穹顶时出错"
-          }
-        }
-      },
-      "camera": {
-        "title": "相机",
-        "connect": "请连接相机",
-        "settings": "设置",
-        "loop": "循环",
-        "capture_running": "捕捉运行中",
-        "image_loading": "图像加载中...",
-        "start_capture": "开始捕捉",
-        "cancel": "取消",
-        "exposure_time": "曝光时间：",
-        "gain_iso": "增益 / ISO：",
-        "name": "相机名称",
-        "gain": "增益",
-        "offset": "偏移",
-        "temperature": "温度",
-        "standby": "待机",
-        "info": "信息",
-        "info_settings": "信息与设置",
-        "please_connect": "请连接相机",
-        "cooler_on": "冷却开启",
-        "cooler_off": "冷却关闭",
-        "dew_heater": "加热窗",
-        "dew_heater_on": "加热窗开启",
-        "dew_heater_off": "加热窗关闭",
-        "camera_cooling": "相机冷却",
-        "target_temperature": "目标温度",
-        "warm_up_time": "预热时间",
-        "cooling_time": "冷却时间"
-      },
-      "tppa": {
-        "title": "三点极轴对准",
-        "camera_mount_required": "必须连接相机且赤道仪未停靠",
-        "start_alignment": "开始对准",
-        "stop_alignment": "停止对准",
-        "altitude_error": "高度错误：",
-        "azimuth_error": "方位错误：",
-        "total_error": "总错误：",
-        "last_update": "最后更新：",
-        "error_values_missing": "缺少错误值",
-        "unknown_response_format": "未知的响应格式",
-        "east": "东",
-        "west": "西",
-        "down": "下",
-        "up": "上",
-        "not_available": "不可用",
-        "running": "运行中"
-      },
-      "logs": {
-        "loading": "加载数据中...",
-        "error": "加载数据时出错："
-      },
-      "test": {
-        "title": "测试"
-      },
-      "loading": "加载中...",
-      "slewAndCenter": {
-        "title": "转动与居中",
-        "LastSelectedImageSource_wrong": "请在 NINA / Framing 中选择离线星图作为图像源",
-        "ra": "赤经：",
-        "dec": "赤纬：",
-        "ra_placeholder": "RA 03:47:28.2",
-        "dec_placeholder": "Dec +24:06:19",
-        "slew": "转动",
-        "slew_and_center": "转动与居中",
-        "errors": {
-          "invalidRAFormat": "无效的 RA 格式。请使用 HH:MM:SS 格式。",
-          "invalidDECFormat": "无效的 DEC 格式。请使用 ±DD:MM:SS 格式。",
-          "invalidRAInput": "无效的 RA 输入。",
-          "invalidDECInput": "无效的 DEC 输入。",
-          "apiUnreachable": "Framing API 无法访问",
-          "invalidFormat": "无效的格式。预期格式：±DD:MM:SS.s",
-          "apiResponseError": "API 响应错误：",
-          "mountInfoError": "获取赤道仪信息时出错："
-        }
-      },
-      "filterwheel": {
-        "filter": "滤镜：",
-        "unknown": "未知",
-        "nofilteravailable": "暂无滤镜可用"
+        "connect": "连接调焦器",
+        "disconnect": "断开调焦器",
+        "error": "控制调焦器错误："
       },
       "rotator": {
-        "label": "旋转器",
-        "move": "移动",
-        "notConnected": "请连接旋转器",
-        "currentPosition": "当前位置：",
-        "moving": "移动中",
-        "stopped": "已停止"
+        "connect": "连接旋转器",
+        "disconnect": "断开旋转器",
+        "error": "控制旋转器错误："
+      },
+      "guider": {
+        "connect": "连接导星",
+        "disconnect": "断开导星",
+        "error": "控制导星错误："
+      },
+      "safety": {
+        "connect": "连接安全监控",
+        "disconnect": "断开安全监控",
+        "error": "控制安全监控错误"
       },
       "flat": {
-        "please_connect_flatDevice": "请连接平场板",
-        "device_name": "名称：",
-        "cover_state": "盖子状态：",
-        "light_state": "灯光状态：",
-        "brightness": "亮度：",
-        "toggle_light": "灯光：",
-        "cover": {
-          "close": "关闭盖子",
-          "open": "打开盖子"
-        },
-        "title": "平板面板"
+        "connect": "连接平场板",
+        "disconnect": "断开平场板",
+        "error": "控制平场板错误："
       },
-      "weatherModal": {
-        "weatherInformation": "天气信息",
-        "metric": "公制",
-        "imperial": "英制",
-        "temperature": "温度",
-        "cloudCover": "云量",
-        "wind": "风",
-        "humidity": "湿度",
-        "pressure": "气压"
+      "dome": {
+        "connect": "连接穹顶",
+        "disconnect": "断开穹顶",
+        "error": "控制穹顶错误："
       },
       "switch": {
-        "gauges": "仪表",
-        "switch": "开关"
+        "connect": "连接开关",
+        "disconnect": "断开开关",
+        "error": "控制开关错误"
+      },
+      "weather": {
+        "connect": "连接天气设备",
+        "disconnect": "断开天气设备",
+        "error": "控制天气设备错误"
       }
+    },
+    "lastLogs": {
+      "loading": "加载数据中...",
+      "error": "加载数据时出错：",
+      "timestamp": "时间戳",
+      "level": "级别",
+      "message": "消息",
+      "member": "成员",
+      "line": "行",
+      "download": "Download"
+    },
+    "navigation": {
+      "equipment": "设备",
+      "camera": "相机",
+      "autofocus": "自动对焦",
+      "mount": "赤道仪",
+      "guider": "导星",
+      "dome": "穹顶",
+      "sequence": "序列",
+      "settings": "设置",
+      "vnc": "VNC"
+    },
+    "language": {
+      "select": "选择语言"
+    },
+    "equipment": {
+      "control": "设备控制"
+    },
+    "sequence": {
+      "title": "序列",
+      "stats": "统计",
+      "noSequenceLoaded": "未加载序列",
+      "noSequenceData": "尚无数据",
+      "startSequence": "开始序列",
+      "stopSequence": "停止序列",
+      "resetSequence": "重置序列",
+      "resetConfirmationTitle": "确认重置",
+      "resetConfirmationMessage": "您确定要重置序列吗？此操作无法撤销。",
+      "exposures": "曝光",
+      "exposureTime": "曝光时间",
+      "filter": "滤镜",
+      "ditherEvery": "每次抖动",
+      "type": "类型",
+      "deltaHFR": "DeltaHFR",
+      "sampleSize": "样本大小",
+      "triggers": "触发器",
+      "details": {
+        "of": "的",
+        "gain": "增益",
+        "ditherAfter": "抖动后",
+        "exposures": "曝光次数"
+      },
+      "date": "日期",
+      "hfr": "HFR",
+      "stars": "星星",
+      "mean": "平均",
+      "median": "中位数",
+      "stDev": "标准差",
+      "rmsText": "RMS",
+      "sequence_control": "序列控制",
+      "temperature": "温度",
+      "monitor": {
+        "settings": {
+          "title": "查看设置",
+          "showImage": "显示最后一张图像",
+          "showImageStats": "显示最后一张图像统计",
+          "showImgStatsGraph": "显示 HFR 图表",
+          "showGuiderGraph": "显示导星图表",
+          "showGuiderAfGraph": "显示自动对焦图表"
+        }
+      },
+      "running": "运行中"
+    },
+    "mount": {
+      "title": "赤道仪",
+      "slew": "转动",
+      "control": {
+        "park": "停靠",
+        "unpark": "解除停靠",
+        "home": "归位",
+        "trackingMode": "跟踪模式",
+        "siderial": "恒星",
+        "lunar": "月亮",
+        "solar": "太阳",
+        "king": "King",
+        "stop": "停止",
+        "errors": {
+          "park": "停靠赤道仪时出错",
+          "unpark": "解除停靠赤道仪时出错",
+          "home": "归位赤道仪时出错",
+          "tracking": "设置跟踪模式时出错"
+        },
+        "manuellControl": "Manual control",
+        "slewRate": "Slew rate °/s"
+      },
+      "info": {
+        "notConnected": "请连接赤道仪",
+        "parked": "已停靠",
+        "unparked": "已解除停靠",
+        "trackingActive": "跟踪已激活",
+        "trackingDisabled": "跟踪已禁用",
+        "slewing": "赤道仪正在转动",
+        "notSlewing": "赤道仪未转动"
+      }
+    },
+    "guider": {
+      "notConnected": "请连接导星",
+      "start": "开始",
+      "startWithCal": "开始校准",
+      "stop": "停止",
+      "rms_error": "RMS 错误",
+      "title": "导星",
+      "running": "RUNNING",
+      "notes": "* This graph displays guiding data according to N.I.N.A.'s settings."
+    },
+    "focuser": {
+      "title": "调焦器",
+      "new_position": "新位置：",
+      "move": "移动",
+      "start_autofocus": "启动自动对焦",
+      "cancel_autofocus": "取消自动对焦",
+      "autofocus_graph": "自动对焦图表",
+      "autofocus_running": "自动对焦运行中",
+      "autofocus_error": "自动对焦错误",
+      "please_connect_focuser": "请连接调焦器",
+      "current_position": "当前位置：",
+      "temperature": "温度：",
+      "moving": "移动中",
+      "stopped": "已停止",
+      "autofocus_active": "自动对焦激活中",
+      "autofocus": "自动对焦",
+      "last_autofocus": "上次自动对焦"
+    },
+    "dome": {
+      "title": "穹顶",
+      "azimuth": "方位角",
+      "slewing": "转动中",
+      "slewing_stopped": "转动已停止",
+      "following": "跟随中",
+      "following_stopped": "跟随已停止",
+      "at_home": "归位",
+      "not_at_home": "未归位",
+      "park": "停靠",
+      "unpark": "解除停靠",
+      "shutter_close": "关闭穹顶",
+      "shutter_open": "打开穹顶",
+      "control": {
+        "open": "打开穹顶",
+        "close": "关闭穹顶",
+        "stop": "停止穹顶移动",
+        "errors": {
+          "open": "打开穹顶时出错",
+          "close": "关闭穹顶时出错",
+          "stop": "停止穹顶时出错"
+        }
+      }
+    },
+    "camera": {
+      "title": "相机",
+      "connect": "请连接相机",
+      "settings": "设置",
+      "loop": "循环",
+      "capture_running": "捕捉运行中",
+      "image_loading": "图像加载中...",
+      "start_capture": "开始捕捉",
+      "cancel": "取消",
+      "exposure_time": "曝光时间：",
+      "gain_iso": "增益 / ISO：",
+      "name": "相机名称",
+      "gain": "增益",
+      "offset": "偏移",
+      "temperature": "温度",
+      "standby": "待机",
+      "info": "信息",
+      "info_settings": "信息与设置",
+      "please_connect": "请连接相机",
+      "cooler_on": "冷却开启",
+      "cooler_off": "冷却关闭",
+      "dew_heater": "加热窗",
+      "dew_heater_on": "加热窗开启",
+      "dew_heater_off": "加热窗关闭",
+      "camera_cooling": "相机冷却",
+      "target_temperature": "目标温度",
+      "warm_up_time": "预热时间",
+      "cooling_time": "冷却时间",
+      "binning_mode": "Binning",
+      "readout_mode": "Readout Mode",
+      "set_use_platesolve": "Use Platesolve"
+    },
+    "tppa": {
+      "title": "三点极轴对准",
+      "camera_mount_required": "必须连接相机且赤道仪未停靠",
+      "start_alignment": "开始对准",
+      "stop_alignment": "停止对准",
+      "altitude_error": "高度错误：",
+      "azimuth_error": "方位错误：",
+      "total_error": "总错误：",
+      "last_update": "最后更新：",
+      "error_values_missing": "缺少错误值",
+      "unknown_response_format": "未知的响应格式",
+      "east": "东",
+      "west": "西",
+      "down": "下",
+      "up": "上",
+      "not_available": "不可用",
+      "running": "运行中"
+    },
+    "logs": {
+      "loading": "加载数据中...",
+      "error": "加载数据时出错："
+    },
+    "test": {
+      "title": "测试"
+    },
+    "loading": "加载中...",
+    "slewAndCenter": {
+      "title": "转动与居中",
+      "LastSelectedImageSource_wrong": "请在 NINA / Framing 中选择离线星图作为图像源",
+      "ra": "赤经：",
+      "dec": "赤纬：",
+      "ra_placeholder": "RA 03:47:28.2",
+      "dec_placeholder": "Dec +24:06:19",
+      "slew": "转动",
+      "slew_and_center": "转动与居中",
+      "errors": {
+        "invalidRAFormat": "无效的 RA 格式。请使用 HH:MM:SS 格式。",
+        "invalidDECFormat": "无效的 DEC 格式。请使用 ±DD:MM:SS 格式。",
+        "invalidRAInput": "无效的 RA 输入。",
+        "invalidDECInput": "无效的 DEC 输入。",
+        "apiUnreachable": "Framing API 无法访问",
+        "invalidFormat": "无效的格式。预期格式：±DD:MM:SS.s",
+        "apiResponseError": "API 响应错误：",
+        "mountInfoError": "获取赤道仪信息时出错："
+      },
+      "rotate": "Rotate",
+      "visibleStars": "Visible Star Search"
+    },
+    "filterwheel": {
+      "filter": "滤镜：",
+      "unknown": "未知",
+      "nofilteravailable": "暂无滤镜可用"
+    },
+    "rotator": {
+      "label": "旋转器",
+      "move": "移动",
+      "notConnected": "请连接旋转器",
+      "currentPosition": "当前位置：",
+      "moving": "移动中",
+      "stopped": "已停止"
+    },
+    "flat": {
+      "please_connect_flatDevice": "请连接平场板",
+      "device_name": "名称：",
+      "cover_state": "盖子状态：",
+      "light_state": "灯光状态：",
+      "brightness": "亮度：",
+      "toggle_light": "灯光：",
+      "cover": {
+        "close": "关闭盖子",
+        "open": "打开盖子"
+      },
+      "title": "平板面板"
+    },
+    "weatherModal": {
+      "weatherInformation": "天气信息",
+      "metric": "公制",
+      "imperial": "英制",
+      "temperature": "温度",
+      "cloudCover": "云量",
+      "wind": "风",
+      "humidity": "湿度",
+      "pressure": "气压",
+      "dewPoint": "Dewpoint",
+      "rainRate": "Rain rate",
+      "skyQuality": "Sky quality",
+      "skyTemperature": "Sky temperature"
+    },
+    "switch": {
+      "gauges": "仪表",
+      "switch": "开关"
     }
   }
+}

@@ -4,7 +4,7 @@
       <h5 class="text-xl font-bold text-white mb-4">{{ $t('components.slewAndCenter.title') }}</h5>
 
       <div
-        v-if="store.profileInfo.FramingAssistantSettings.LastSelectedImageSource !== 5"
+        v-if="store.profileInfo.FramingAssistantSettings.LastSelectedImageSource !== 'SKYATLAS'"
         class="flex justify-center items-center pb-2"
       >
         <div class="w-full p-4 bg-red-500/10 border border-red-500/30 rounded-lg">
@@ -35,15 +35,48 @@
           />
         </div>
         <div class="mt-4 flex gap-2">
-          <button @click="slew" class="default-button-cyan">
+          <button
+            @click="slew"
+            :disabled="
+              framingStore.isSlewing ||
+              framingStore.isSlewingAndCentering ||
+              framingStore.isRotating
+            "
+            class="default-button-cyan flex items-center justify-center disabled:opacity-50"
+          >
+            <span v-if="framingStore.isSlewing" class="loader mr-2"></span>
             {{ $t('components.slewAndCenter.slew') }}
           </button>
-          <button @click="slewAndCenter" class="default-button-cyan">
+
+          <button
+            @click="slewAndCenter"
+            :disabled="
+              framingStore.isSlewing ||
+              framingStore.isSlewingAndCentering ||
+              framingStore.isRotating
+            "
+            class="default-button-cyan flex items-center justify-center disabled:opacity-50"
+          >
+            <span v-if="framingStore.isSlewingAndCentering" class="loader mr-2"></span>
             {{ $t('components.slewAndCenter.slew_and_center') }}
           </button>
         </div>
+        <div v-if="store.rotatorInfo.Connected && true" class="mt-2">
+          <button
+            @click="cameraRotate"
+            :disabled="
+              framingStore.isSlewing ||
+              framingStore.isSlewingAndCentering ||
+              framingStore.isRotating
+            "
+            class="default-button-cyan flex items-center justify-center disabled:opacity-50"
+          >
+            <span v-if="framingStore.isRotating" class="loader mr-2"></span>
+            {{ $t('components.slewAndCenter.rotate') }}
+          </button>
+        </div>
         <div class="w-full">
-          <setSequenceTarget class="mt-2" />
+          <setSequenceTarget class="mt-3" />
         </div>
       </div>
     </div>
@@ -61,14 +94,11 @@ import setSequenceTarget from '@/components/framing/setSequenceTarget.vue';
 const { t } = useI18n();
 const store = apiStore();
 const framingStore = useFramingStore();
-
 const props = defineProps({
   RAangleString: String,
   DECangleString: String,
 });
-
 const emit = defineEmits(['update:RAangleString', 'update:DECangleString']);
-
 const localRAangleString = ref(props.RAangleString);
 const localDECangleString = ref(props.DECangleString);
 const RAangle = ref(null);
@@ -89,16 +119,19 @@ watch(
 );
 
 function validateRA(raString) {
-  const raPattern = /^([01]?[0-9]|2[0-3]):([0-5]?[0-9]):([0-5]?[0-9](\.\d+)?)$/;
+  const raPattern = /^([01]?[0-9]|2[0-3]):([0-5]?[0-9]):(60(\.0+)?|[0-5]?[0-9](\.\d+)?)$/;
   return raPattern.test(raString);
 }
 
 function validateDEC(decString) {
-  const decPattern = /^(\+|-)?(90|[0-8]?[0-9]):([0-5]?[0-9]):([0-5]?[0-9](\.\d+)?)$/;
+  const decPattern = /^(\+|-)?(90:00:00(\.0+)?|([0-8]?[0-9]):([0-5]?[0-9]):([0-5][0-9](\.\d+)?))$/;
   return decPattern.test(decString);
 }
 
 function handleBlurRA() {
+  if (!localRAangleString.value) {
+    return; // Nichts tun, wenn der Wert leer ist
+  }
   if (validateRA(localRAangleString.value)) {
     updateRA();
   } else {
@@ -107,6 +140,9 @@ function handleBlurRA() {
 }
 
 function handleBlurDEC() {
+  if (!localDECangleString.value) {
+    return; // Nichts tun, wenn der Wert leer ist
+  }
   if (validateDEC(localDECangleString.value)) {
     console.log('Lokal DEC', localDECangleString.value);
     updateDec();
@@ -143,24 +179,20 @@ async function slew() {
   await unparkMount(); // Überprüfen und Entparken, falls erforderlich
   RAangle.value = hmsToDegrees(localRAangleString.value);
   DECangle.value = dmsToDegrees(localDECangleString.value);
-  try {
-    await apiService.slewAndCenter(RAangle.value, DECangle.value, false);
-  } catch (error) {
-    console.error(t('components.slewAndCenter.errors.apiUnreachable'), error);
-  }
+  framingStore.slew(RAangle.value, DECangle.value);
 }
 
 async function slewAndCenter() {
   RAangle.value = hmsToDegrees(localRAangleString.value);
   DECangle.value = dmsToDegrees(localDECangleString.value);
   await unparkMount(); // Überprüfen und Entparken, falls erforderlich
-  try {
-    await apiService.slewAndCenter(RAangle.value, DECangle.value, true);
-  } catch (error) {
-    console.error(t('components.slewAndCenter.errors.apiUnreachable'), error);
-  }
+  framingStore.slewAndCenter(RAangle.value, DECangle.value);
   emit('update:RAangleString', localRAangleString.value);
   emit('update:DECangleString', localDECangleString.value);
+}
+
+async function cameraRotate() {
+  framingStore.cameraRotate();
 }
 
 function hmsToDegrees(hmsString) {
@@ -224,3 +256,23 @@ onBeforeUnmount(() => {
   stopFetchingInfo();
 });
 </script>
+
+<style scoped>
+.loader {
+  border: 2px solid #f3f3f3;
+  border-top: 2px solid #3498db;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+</style>

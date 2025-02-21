@@ -5,8 +5,8 @@
         class="flex flex-row items-center justify-between w-full border border-gray-300 p-3 rounded-xl transition-all duration-200 hover:border-cyan-500 focus-within:border-cyan-500 hover:shadow-lg md:p-4"
       >
         <div>
-          <p class="text-sm font-medium text-gray-700 md:text-base">{{ WritableSwitche.Name }}</p>
-          <p class="text-xs text-gray-400 mt-1">{{ WritableSwitche.Description }}</p>
+          <p class="text-sm font-medium text-gray-400 md:text-base">{{ WritableSwitche.Name }}</p>
+          <p class="text-xs text-gray-700 mt-1">{{ WritableSwitche.Description }}</p>
         </div>
         <toggleButton
           @click="setBool(WritableSwitche.Id, WritableSwitche.Value)"
@@ -21,8 +21,8 @@
         class="flex flex-row items-center justify-between w-full border border-gray-300 p-3 rounded-xl transition-all duration-200 hover:border-cyan-500 focus-within:border-cyan-500 hover:shadow-lg md:p-4"
       >
         <div>
-          <p class="text-sm font-medium text-gray-700 md:text-base">{{ WritableSwitche.Name }}</p>
-          <p class="text-xs text-gray-400 mt-1">{{ WritableSwitche.Description }}</p>
+          <p class="text-sm font-medium text-gray-400 md:text-base">{{ WritableSwitche.Name }}</p>
+          <p class="text-xs text-gray-700 mt-1">{{ WritableSwitche.Description }}</p>
         </div>
         <SetValue
           @blur="

@@ -16,8 +16,9 @@
   },
   "app": {
     "title": "Touch'N'Stars",
-    "unreachable": "NINA-API is unreachable or the version is too old",
-    "connecting": "Attempting to establish connection"
+    "unreachable": "NINA-API is unreachable",
+    "connecting": "Attempting to establish connection",
+    "api_version_incompatible": "Advanced-API version incompatible current: { current } required: { required }"
   },
   "setup": {
     "welcome": "Welcome to Touch'N'Stars",
@@ -54,7 +55,18 @@
         "invalidIPFormat": "Please provide IP or FQDN",
         "invalidPortRange": "Invalid Port"
       },
-      "showTutorial": "Show Tutorial"
+      "showTutorial": "Show Tutorial",
+      "system": {
+        "title": "System Controls",
+        "description": "Click an icon to restart or shutdown the system",
+        "confirmShutdown": "Are you sure you want to shutdown the system?",
+        "confirmRestart": "Are you sure you want to restart the system?",
+        "confirmation": "Confirmation"
+      },
+      "image": {
+        "title": "Images settings",
+        "quality": "Quality in % "
+      }
     },
     "framing": {
       "confirmSetTargetTitle": "Confirm Target Selection",
@@ -67,12 +79,16 @@
       },
       "openFraminingModal": "Open in framing-assistant",
       "fovSettings": {
-        "fov": "Field of View",
-        "focalLengthM": "Focal length (mm)",
-        "pixelSizeM": "Camerapixel size (µm)",
-        "sensorHeightPx": "Camerasensor height (px)",
-        "sensorWidthPx": "Camerasensor width (px)"
-      }
+        "rotationAngle": "Camera rotation",
+        "fov": "Field of View"
+      },
+      "getImageRotation": {
+        "startCapture": "Determine rotation from camera",
+        "SolveRun": "Platesolve",
+        "SolveError": "Error solving image"
+      },
+      "moveRotator": "Rotate camera",
+      "infoTargetImage": "If the image is only displayed in black, the “Offline Sky Map Cache“ must be set up in NINA or the “use NINA cache” option must be deactivated"
     },
     "connectEquipment": {
       "camera": {
@@ -142,7 +158,8 @@
       "level": "Level",
       "message": "Message",
       "member": "Member",
-      "line": "Line"
+      "line": "Line",
+      "download": "Download"
     },
     "navigation": {
       "equipment": "Equipment",
@@ -156,9 +173,6 @@
       "vnc": "VNC"
     },
     "language": {
-      "en": "English",
-      "de": "German",
-      "fr": "France",
       "select": "Select language"
     },
     "equipment": {
@@ -168,7 +182,7 @@
       "title": "Sequence",
       "stats": "Stats",
       "noSequenceLoaded": "No sequence loaded",
-      "noSequenceData": "no data available yet",
+      "noSequenceData": "No data available yet",
       "startSequence": "Start sequence",
       "stopSequence": "Stop sequence",
       "resetSequence": "Reset sequence",
@@ -217,6 +231,8 @@
         "unpark": "Unpark",
         "home": "Home",
         "trackingMode": "Tracking Mode",
+        "manuellControl": "Manual control",
+        "slewRate": "Slew rate °/s",
         "siderial": "Siderial",
         "lunar": "Lunar",
         "solar": "Solar",
@@ -245,7 +261,9 @@
       "startWithCal": "Starting with calibration",
       "stop": "Stop",
       "rms_error": "RMS Error",
-      "title": "Guider"
+      "title": "Guider",
+      "running": "RUNNING",
+      "notes": "* This graph displays guiding data according to N.I.N.A.'s settings."
     },
     "focuser": {
       "title": "Focuser",
@@ -267,17 +285,17 @@
     },
     "dome": {
       "title": "Dome",
-      "azimuth": "azimuth",
-      "slewing": "slewing",
-      "slewing_stopped": "slewing stopped",
-      "following": "following",
-      "following_stopped": "following stopped",
+      "azimuth": "Azimuth",
+      "slewing": "Slewing",
+      "slewing_stopped": "Slewing stopped",
+      "following": "Following",
+      "following_stopped": "Following stopped",
       "at_home": "Home",
-      "not_at_home": "not at home",
-      "park": "park",
-      "unpark": "unpark",
-      "shutter_close": "shutter close",
-      "shutter_open": "shutter open",
+      "not_at_home": "Not at home",
+      "park": "Park",
+      "unpark": "Unpark",
+      "shutter_close": "Shutter closed",
+      "shutter_open": "Shutter open",
       "control": {
         "open": "Open shutter",
         "close": "Close shutter",
@@ -316,7 +334,10 @@
       "camera_cooling": "Camera cooling",
       "target_temperature": "Target temperature",
       "warm_up_time": "Warm-up time",
-      "cooling_time": "Cooling time"
+      "cooling_time": "Cooling time",
+      "binning_mode": "Binning",
+      "readout_mode": "Readout Mode",
+      "set_use_platesolve": "Use Platesolve"
     },
     "tppa": {
       "title": "Three Point Polar Alignment",
@@ -353,6 +374,7 @@
       "dec_placeholder": "Dec +24:06:19",
       "slew": "Slew",
       "slew_and_center": "Slew and Center",
+      "rotate": "Rotate",
       "errors": {
         "invalidRAFormat": "Invalid RA format. Please use HH:MM:SS.",
         "invalidDECFormat": "Invalid DEC format. Please use ±DD:MM:SS.",
@@ -362,7 +384,8 @@
         "invalidFormat": "Invalid format. Expected: ±DD:MM:SS.s",
         "apiResponseError": "Error in API response:",
         "mountInfoError": "Error fetching mount information:"
-      }
+      },
+      "visibleStars": "Visible Star Search"
     },
     "filterwheel": {
       "filter": "Filter:",
@@ -398,7 +421,11 @@
       "cloudCover": "Cloud Cover",
       "wind": "Wind",
       "humidity": "Humidity",
-      "pressure": "Pressure"
+      "pressure": "Pressure",
+      "skyTemperature": "Sky temperature",
+      "skyQuality": "Sky quality",
+      "rainRate": "Rain rate",
+      "dewPoint": "Dewpoint"
     },
     "switch": {
       "gauges": "Gauges",

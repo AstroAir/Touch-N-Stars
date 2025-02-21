@@ -5,7 +5,7 @@
       v-if="showSettingsModal"
       class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
     >
-      <div class="bg-gray-800 rounded-lg p-6 max-w-sm w-full mx-4 relative">
+      <div class="bg-gray-800 rounded-lg p-6 max-w-sm w-full mx-4 relative shadow-xl shadow-black">
         <!-- Schließen-Button oben rechts -->
         <button
           @click="showSettingsModal = false"

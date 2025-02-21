@@ -28,3 +28,5 @@ pnpm-debug.log*
 *.spec
 node_modules
 copyDistToPlugin.bat
+
+resources/android/**/*

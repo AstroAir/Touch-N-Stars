@@ -39,7 +39,7 @@ function selectItem(value) {
 
 <style scoped>
 .subnav {
-  @apply w-full border-t border-cyan-500/20 z-10;
+  @apply w-full border-t border-cyan-500/20;
 }
 
 .subnav-button {

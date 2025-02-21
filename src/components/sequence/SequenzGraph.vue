@@ -40,6 +40,9 @@ function initGraph() {
   // Y-Achse (Daten) für HFR
   const hfrData = responseData.map((item) => item.HFR);
 
+  // Y-Achse (Daten) für Median
+  const medinaData = responseData.map((item) => item.Median);
+
   // Chart.js-Instanz erzeugen
   chart = new Chart(rmsGraph.value, {
     type: 'line',
@@ -60,6 +63,13 @@ function initGraph() {
           fill: false,
           yAxisID: 'yHfr', // <--- Wichtig: ID der rechten Y-Achse
         },
+        {
+          label: 'Median',
+          data: medinaData,
+          borderColor: 'green',
+          fill: false,
+          yAxisID: 'yMedian', // <--- Wichtig: ID der linken Y-Achse
+        },
       ],
     },
     options: {
@@ -68,7 +78,7 @@ function initGraph() {
         x: {
           title: {
             display: true,
-            text: 'Zeit',
+            text: 'Time',
           },
         },
         // Linke Y-Achse
@@ -90,6 +100,17 @@ function initGraph() {
             display: true,
             text: 'HFR',
           },
+        },
+        // Rechte Y-Achse
+        yMedian: {
+          type: 'linear',
+          display: true,
+          position: 'right',
+          title: {
+            display: true,
+            text: 'Median',
+          },
+
           // Verhindert Überlagerung der Gitterlinien
           grid: {
             drawOnChartArea: false,
@@ -116,10 +137,12 @@ watch(
         const newLabels = newVal.map((item) => new Date(item.Date).toLocaleTimeString());
         const newStarsData = newVal.map((item) => item.Stars);
         const newHfrData = newVal.map((item) => item.HFR);
+        const newMedianData = newVal.map((item) => item.Median);
 
         chart.data.labels = newLabels;
         chart.data.datasets[0].data = newStarsData; // Stars
         chart.data.datasets[1].data = newHfrData; // HFR
+        chart.data.datasets[2].data = newMedianData; // Median
         chart.update();
       }
     }

@@ -16,8 +16,9 @@
   },
   "app": {
     "title": "Touch'N'Stars",
-    "unreachable": "NINA-API non raggiungibile o versione troppo vecchia",
-    "connecting": "Tentativo di stabilire connessione"
+    "unreachable": "NINA-API non raggiungibile",
+    "connecting": "Tentativo di stabilire connessione",
+    "api_version_incompatible": "Versione avanzata-API corrente incompatibile: {current} richiesta: {required}"
   },
   "setup": {
     "welcome": "Benvenuto in Touch'N'Stars",
@@ -54,7 +55,18 @@
         "invalidIPFormat": "Si prega di fornire IP o FQDN",
         "invalidPortRange": "La porta deve essere compresa tra 1 e 65535"
       },
-      "showTutorial": "Mostra Tutorial"
+      "showTutorial": "Mostra Tutorial",
+      "system": {
+        "description": "Fare clic su icona per riavviare o arrestare il sistema",
+        "title": "Controlli di sistema",
+        "confirmRestart": "Sei sicuro di voler riavviare il sistema?",
+        "confirmShutdown": "Sei sicuro di voler chiudere il sistema?",
+        "confirmation": "Conferma"
+      },
+      "image": {
+        "quality": "Qualità in %",
+        "title": "Impostazioni delle immagini"
+      }
     },
     "framing": {
       "confirmSetTargetTitle": "Conferma Selezione Target",
@@ -64,7 +76,19 @@
       "search": {
         "title": "Cerca",
         "placeholder": "Inserisci un termine di ricerca..."
-      }
+      },
+      "fovSettings": {
+        "fov": "Campo visivo",
+        "rotationAngle": "Rotazione della fotocamera"
+      },
+      "getImageRotation": {
+        "SolveError": "Errore di risoluzione dell'immagine",
+        "SolveRun": "Piastre",
+        "startCapture": "Determina la rotazione dalla fotocamera"
+      },
+      "moveRotator": "Ruota la fotocamera",
+      "openFraminingModal": "Aperto nell'inquadratura assistente",
+      "infoTargetImage": "Se l'immagine viene visualizzata solo in nero, la \"cache della mappa del cielo offline\" deve essere impostata in Nina o l'opzione \"Usa cache Nina\" deve essere disattivata"
     },
     "connectEquipment": {
       "camera": {
@@ -134,7 +158,8 @@
       "level": "Livello",
       "message": "Messaggio",
       "member": "Membro",
-      "line": "Linea"
+      "line": "Linea",
+      "download": "Scaricamento"
     },
     "navigation": {
       "equipment": "Attrezzatura",
@@ -148,10 +173,6 @@
       "vnc": "VNC"
     },
     "language": {
-      "en": "Inglese",
-      "de": "Tedesco",
-      "fr": "Francese",
-      "it": "Italiano",
       "select": "Seleziona lingua"
     },
     "equipment": {
@@ -220,7 +241,9 @@
           "unpark": "Errore sblocco montatura",
           "home": "Errore home montatura",
           "tracking": "Errore impostazione modalità tracking"
-        }
+        },
+        "manuellControl": "Controllo manuale",
+        "slewRate": "Trovatela di Slew °/s"
       },
       "info": {
         "notConnected": "Collega montatura",
@@ -238,7 +261,9 @@
       "startWithCal": "Avvia con calibrazione",
       "stop": "Ferma",
       "rms_error": "Errore RMS",
-      "title": "Guida"
+      "title": "Guida",
+      "running": "CORSA",
+      "notes": "* Questo grafico visualizza i dati guida in base alle impostazioni di N.I.N.A."
     },
     "focuser": {
       "title": "Messa a Fuoco",
@@ -309,7 +334,10 @@
       "camera_cooling": "Raffreddamento fotocamera",
       "target_temperature": "Temperatura target",
       "warm_up_time": "Tempo riscaldamento",
-      "cooling_time": "Tempo raffreddamento"
+      "cooling_time": "Tempo raffreddamento",
+      "binning_mode": "Binning",
+      "readout_mode": "Modalità di lettura",
+      "set_use_platesolve": "Usa le piastre"
     },
     "tppa": {
       "title": "Allineamento Polare a Tre Punti",
@@ -355,7 +383,9 @@
         "invalidFormat": "Formato non valido. Previsto: ±DD:MM:SS.s",
         "apiResponseError": "Errore risposta API:",
         "mountInfoError": "Errore recupero informazioni montatura:"
-      }
+      },
+      "rotate": "Ruotare",
+      "visibleStars": "Ricerca a stella visibile"
     },
     "filterwheel": {
       "filter": "Filtro:",
@@ -391,7 +421,11 @@
       "cloudCover": "Copertura Nuvolosa",
       "wind": "Vento",
       "humidity": "Umidità",
-      "pressure": "Pressione"
+      "pressure": "Pressione",
+      "dewPoint": "Punti di rugiada",
+      "rainRate": "Tasso di pioggia",
+      "skyQuality": "Qualità del cielo",
+      "skyTemperature": "Temperatura del cielo"
     },
     "switch": {
       "gauges": "Indicatori",

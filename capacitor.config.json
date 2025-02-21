@@ -1,0 +1,16 @@
+{
+  "appId": "com.Touch-N-Stars.dev",
+  "appName": "Touch-N-Stars",
+  "webDir": "dist",
+  "server":{
+    "cleartext": true,
+    "androidScheme": "http"
+  },
+  "plugins": {
+    "StatusBar": {
+      "overlaysWebView": false,
+      "style": "DARK",
+      "backgroundColor": "#1F2937"
+    }
+  }
+}

@@ -16,8 +16,9 @@
   },
   "app": {
     "title": "Touch'N'Stars",
-    "unreachable": "NINA-API je momentálně nedostupné nebo používáte jeho zastaralou verzi",
-    "connecting": "Pokus o připojení"
+    "unreachable": "NINA-API je nedostupné",
+    "connecting": "Pokus o připojení",
+    "api_version_incompatible": "Verze pokročilého rozhraní API je nekompatibilní, aktuální: { current } požadovaná: { required }"
   },
   "setup": {
     "welcome": "Vítá Vás Touch'N'Stars",
@@ -54,7 +55,18 @@
         "invalidIPFormat": "Uveďte prosím IP nebo FQDN",
         "invalidPortRange": "Port musí být v rozsahu 1 až 65535"
       },
-      "showTutorial": "Ukázat Tutoriál"
+      "showTutorial": "Ukázat Tutoriál",
+      "system": {
+        "description": "Klikněte na libovolnou ikonu pro restart nebo vypnutí systému",
+        "title": "Ovládání Systému",
+        "confirmRestart": "Určitě chcete systém restartovat?",
+        "confirmShutdown": "Jste si jisti, že chcete systém vypnout?",
+        "confirmation": "Potvrzení"
+      },
+      "image": {
+        "quality": "Kvalita v %",
+        "title": "Nastavení snímků"
+      }
     },
     "framing": {
       "confirmSetTargetTitle": "Potvrzení Výběru Cíle",
@@ -64,7 +76,19 @@
       "search": {
         "title": "Hledat",
         "placeholder": "Zadejte hledaný výraz..."
-      }
+      },
+      "fovSettings": {
+        "rotationAngle": "Natočení kamery",
+        "fov": "Zorné Pole"
+      },
+      "getImageRotation": {
+        "SolveError": "Chyba při řešení snímku",
+        "SolveRun": "Astrometrie",
+        "startCapture": "Určení rotace z kamerya"
+      },
+      "moveRotator": "Otáčení kamery",
+      "openFraminingModal": "Spustť ve Snímkování",
+      "infoTargetImage": "Pokud se snímek zobrazuje pouze černě, je nutné v NINA nastavit „Offline Mapa Oblohy“ nebo deaktivovat možnost „Použít NINA Mezipamět"
     },
     "connectEquipment": {
       "camera": {
@@ -134,7 +158,8 @@
       "level": "Úroveň",
       "message": "Zpráva",
       "member": "Člen",
-      "line": "Řádek"
+      "line": "Řádek",
+      "download": "Stáhnout"
     },
     "navigation": {
       "equipment": "Zařízení",
@@ -148,11 +173,6 @@
       "vnc": "VNC"
     },
     "language": {
-      "en": "Angličtina",
-      "de": "Němčina",
-      "fr": "Francouština",
-      "it": "Italština",
-      "cz": "Čeština",
       "select": "Výběr jazyka"
     },
     "equipment": {
@@ -221,7 +241,9 @@
           "unpark": "Chyba při odparkování montáže",
           "home": "Chyba v navádění montáže",
           "tracking": "Chyba při nastavování režimu sledován"
-        }
+        },
+        "manuellControl": "Ruční Ovládání",
+        "slewRate": "Rychlost pohybu °/s"
       },
       "info": {
         "notConnected": "Připojte montáž",
@@ -239,7 +261,9 @@
       "startWithCal": "Spustit s kalibarcí",
       "stop": "Zastavit",
       "rms_error": "RMS Chyba",
-      "title": "Navádění"
+      "title": "Navádění",
+      "running": "PROBÍHÁ",
+      "notes": "* Tento graf zobrazuje data navádění podle nastavení N.I.N.A."
     },
     "focuser": {
       "title": "Ostření",
@@ -284,7 +308,7 @@
       }
     },
     "camera": {
-      "title": "kamera",
+      "title": "Kamera",
       "connect": "Připojte kameru",
       "settings": "Nastavení",
       "loop": "Cyklus",
@@ -310,7 +334,10 @@
       "camera_cooling": "Chlazení kamery",
       "target_temperature": "Cílová teplota",
       "warm_up_time": "Doba zahřátí",
-      "cooling_time": "Doba chlazení"
+      "cooling_time": "Doba chlazení",
+      "binning_mode": "Binning",
+      "readout_mode": "Režim Čtení",
+      "set_use_platesolve": "Použít Řešení"
     },
     "tppa": {
       "title": "Tříbodové Polární Zarovnání",
@@ -356,7 +383,9 @@
         "invalidFormat": "Nesprávný formát. Očekává se: ±DD:MM:SS.s",
         "apiResponseError": "Chyba v odpovědi API:",
         "mountInfoError": "Chyba při získávání informací o montáži:"
-      }
+      },
+      "rotate": "Rotace",
+      "visibleStars": "Hledání Viditelných Hvězd"
     },
     "filterwheel": {
       "filter": "Filtr:",
@@ -392,7 +421,11 @@
       "cloudCover": "Oblačnost",
       "wind": "Vítr",
       "humidity": "Vlhkost",
-      "pressure": "Tlak"
+      "pressure": "Tlak",
+      "dewPoint": "Rosný bod",
+      "rainRate": "Intenzita deště",
+      "skyQuality": "Kvalita oblohy",
+      "skyTemperature": "Teplota oblohy"
     },
     "switch": {
       "gauges": "Měřící přístroje",

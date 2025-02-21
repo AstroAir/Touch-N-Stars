@@ -1,5 +1,6 @@
 <template>
   <div>
+    <!-- Backend unreachable error -->
     <div
       v-if="!store.isBackendReachable"
       class="p-4 bg-red-500/10 border border-red-500/30 rounded-lg"
@@ -8,7 +9,26 @@
         {{ $t('app.unreachable') }}
       </div>
     </div>
+
+    <!-- API version incompatible error -->
+    <div
+      v-else-if="!store.isVersionNewerOrEqual"
+      class="p-4 bg-yellow-500/10 border border-yellow-500/30 rounded-lg"
+    >
+      <div class="text-yellow-600 text-3xl">
+        {{
+          $t('app.api_version_incompatible', {
+            current: store.currentApiVersion,
+            required: store.minimumApiVersion,
+          })
+        }}
+      </div>
+    </div>
+
+    <!-- Loading state -->
     <div v-else-if="isLoading">{{ $t('components.loading') }}</div>
+
+    <!-- Main content -->
     <div v-else>
       <div
         v-for="(entry, index) in firstLog"
@@ -149,7 +169,6 @@ function handleWeatherClick(event) {
   event.preventDefault();
 }
 
-// Function to format timestamp
 function formatTimestamp(timestamp) {
   const date = new Date(timestamp);
   const timeString = date.toLocaleTimeString('de-DE', {
@@ -165,27 +184,20 @@ function formatTimestamp(timestamp) {
   return `${timeString}, ${dateString}`;
 }
 
-// Computed property for the first log entry
-/*const firstLog = computed(() => {
-  return logStore.LogsInfo.logs.slice(0, 1);
-});*/
-// Computed property for the filtered first log entry
 const firstLog = computed(() => {
-  return logStore.LogsInfo.logs.filter(
-    (entry) => !entry.message.includes('EDS_ERR_INVALID_PARAMETER')
-  ).slice(0, 1);
+  return logStore.LogsInfo.logs
+    .filter((entry) => !entry.message.includes('EDS_ERR_INVALID_PARAMETER'))
+    .slice(0, 1);
 });
 
-
-// Watch when logs are loaded
 onMounted(() => {
   const unwatch = logStore.$subscribe((mutation, state) => {
-    if (!store.isBackendReachable) {
+    if (!store.isBackendConnected) {
       isLoading.value = false;
     }
     if (state.LogsInfo.logs.length > 0) {
       isLoading.value = false;
-      unwatch(); // Stop watching once the data is loaded
+      unwatch();
     }
   });
 });
@@ -195,7 +207,6 @@ watch(
   (newVal, oldVal) => {
     if (!oldVal || newVal.length > oldVal.length) {
       isLoading.value = false;
-      console.log('ja');
     }
   },
   { immediate: false }

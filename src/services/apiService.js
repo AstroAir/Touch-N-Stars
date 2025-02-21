@@ -138,7 +138,36 @@ const apiService = {
       });
       return response.data;
     } catch (error) {
-      console.error('Error switch profil:', error);
+      console.error('Error setTrackingMode:', error);
+      throw error;
+    }
+  },
+
+  async moveAxis(direction, rate = 8) {
+    try {
+      const { BASE_URL } = getUrls();
+      const response = await axios.get(`${BASE_URL}/equipment/mount/move-axis`, {
+        params: {
+          direction,
+          rate,
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error moveAxis:', error);
+      throw error;
+    }
+  },
+
+  async moveAxisStop() {
+    try {
+      const { BASE_URL } = getUrls();
+      const response = await axios.get(`${BASE_URL}/equipment/mount/move-axis/stop`, {
+        params: {},
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error moveAxisStop:', error);
       throw error;
     }
   },
@@ -201,13 +230,15 @@ const apiService = {
     return this._simpleGetRequest(`${BASE_URL}/equipment/camera/${action}`);
   },
 
-  async startCapture(duration, gain) {
+  async startCapture(duration, gain, solve = false) {
+    console.log('Zeit:', duration, 'Gain: ', gain);
     try {
       const { BASE_URL } = getUrls();
       const response = await axios.get(`${BASE_URL}/equipment/camera/capture`, {
         params: {
           duration: duration,
           gain: gain,
+          solve: solve,
         },
       });
       return response.data;
@@ -217,11 +248,46 @@ const apiService = {
     }
   },
 
-  async getCaptureResult() {
+  async getPlatesovle(duration, gain) {
     try {
       const { BASE_URL } = getUrls();
       const response = await axios.get(`${BASE_URL}/equipment/camera/capture`, {
-        params: { getResult: true, quality: 80 },
+        params: {
+          duration: duration,
+          gain: gain,
+          solve: true,
+          omitImage: true,
+          waitForResult: true,
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error starting capture:', error);
+      throw error;
+    }
+  },
+
+  async getCaptureResult(quality = 80) {
+    try {
+      const { BASE_URL } = getUrls();
+      const response = await axios.get(`${BASE_URL}/equipment/camera/capture`, {
+        params: { getResult: true, quality: quality },
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error retrieving capture result:', error);
+      throw error;
+    }
+  },
+
+  async getImageData() {
+    try {
+      const { BASE_URL } = getUrls();
+      const response = await axios.get(`${BASE_URL}/equipment/camera/capture`, {
+        params: {
+          getResult: true,
+          omitImage: true,
+        },
       });
       return response.data;
     } catch (error) {
@@ -284,6 +350,32 @@ const apiService = {
       return response.data;
     } catch (error) {
       console.error('Error retrieving capture result:', error);
+      throw error;
+    }
+  },
+
+  async setBinningMode(mode) {
+    try {
+      const { BASE_URL } = getUrls();
+      const response = await axios.get(`${BASE_URL}/equipment/camera/set-binning`, {
+        params: { binning: mode },
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error retrieving result:', error);
+      throw error;
+    }
+  },
+
+  async setReadoutMode(mode) {
+    try {
+      const { BASE_URL } = getUrls();
+      const response = await axios.get(`${BASE_URL}/equipment/camera/set-readout`, {
+        params: { mode: mode },
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error retrieving result:', error);
       throw error;
     }
   },
@@ -466,20 +558,55 @@ const apiService = {
     }
   },
 
+  async setFramingCoordinates(RAangle, DECangle) {
+    try {
+      const { BASE_URL } = getUrls();
+      const response = await axios.get(`${BASE_URL}/framing/set-coordinates`, {
+        params: { RAangle, DECangle },
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error setting framing coordinates:', error);
+      throw error;
+    }
+  },
+
   async slewAndCenter(RAangle, DECangle, Center) {
     try {
       const { BASE_URL } = getUrls();
-      await axios.get(`${BASE_URL}/framing/set-coordinates`, {
-        params: { RAangle, DECangle },
+      await this.setFramingCoordinates(RAangle, DECangle);
+      await new Promise((resolve) => setTimeout(resolve, 3000)); // damit NINA genug Zeit hat die Koordinaten zu setzen
+      const response = await axios.get(`${BASE_URL}/framing/slew`, {
+        params: {
+          slew_option: Center ? 'Center' : '',
+          waitForResult: true,
+        },
       });
-
-      await new Promise((resolve) => setTimeout(resolve, 4000));
-
-      const params = Center ? { slew_option: 'Center' } : {};
-      const response = await axios.get(`${BASE_URL}/framing/slew`, { params });
       return response.data;
     } catch (error) {
-      console.error('Error controlling mount:', error);
+      console.error('Error controlling slewAndCenterAndRotate:', error);
+      throw error;
+    }
+  },
+
+  async framingRotate(rotation) {
+    try {
+      const { BASE_URL } = getUrls();
+      await axios.get(`${BASE_URL}/framing/set-rotation`, {
+        params: {
+          rotation: rotation,
+        },
+      });
+      await new Promise((resolve) => setTimeout(resolve, 3000)); // damit NINA genug Zeit hat die Koordinaten zu setzen
+      const response = await axios.get(`${BASE_URL}/framing/slew`, {
+        params: {
+          slew_option: 'Rotate',
+          waitForResult: true,
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error controlling slewAndCenterAndRotate:', error);
       throw error;
     }
   },
@@ -553,6 +680,17 @@ const apiService = {
       console.error('Error retrieving logs result:', error);
       throw error;
     }
+  },
+
+  //-------------------------------------  System Controls ------------------------------
+  shutdown() {
+    const { API_URL } = getUrls();
+    return this._simpleGetRequest(`${API_URL}system/shutdown`);
+  },
+
+  restart() {
+    const { API_URL } = getUrls();
+    return this._simpleGetRequest(`${API_URL}system/restart`);
   },
 
   //-------------------------------------  Helper ---------------------------------------

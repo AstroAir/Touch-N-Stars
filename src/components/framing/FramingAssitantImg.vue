@@ -25,59 +25,43 @@
         :style="{
           width: `${framingStore.camWidth}px`,
           height: `${framingStore.camHeight}px`,
-          transform: `translate(${x}px, ${y}px) rotate(${rotationAngle}deg)`,
+          transform: `translate(${x}px, ${y}px) rotate(${-framingStore.rotationAngle}deg)`,
           zIndex: 2,
         }"
       ></div>
 
-      <!-- Moveable: rotierbar ist hier fest auf "true" gesetzt -->
+      <!-- Moveable-->
       <Moveable
         ref="moveableRef"
         :target="targetRef"
         :draggable="true"
         :rotatable="false"
         @drag="onDrag"
-        @rotate="onRotate"
       />
-    </div>
-
-    <!-- Beispiel-Bedienelemente für den Winkel -->
-    <div class="mt-4 flex gap-2">
-      <!-- Button: Winkel auf +15° erhöhen -->
-      <button @click="rotateBy15">+15°</button>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, nextTick } from 'vue';
+import { ref, onMounted, nextTick, watch } from 'vue';
 import Moveable from 'vue3-moveable';
 import { useFramingStore } from '@/store/framingStore';
+import { useSettingsStore } from '@/store/settingsStore';
 import apiService from '@/services/apiService';
 
-// Stores / refs
 const framingStore = useFramingStore();
+const settingsStore = useSettingsStore();
 const isLoading = ref(true);
 const targetPic = ref(null);
-
-// Für die Berechnungen
 const scaleDegPerPixel = ref(0.004); // Grad pro Pixel
 const baseRA = framingStore.RAangle;
 const baseDec = framingStore.DECangle;
-
-// Positions-Koordinaten
 const x = ref(0);
 const y = ref(0);
-
-// Hier die "rotationAngle"-Variable, die den Winkel in Grad speichert
-const rotationAngle = ref(0);
-
-// Referenzen
 const containerRef = ref(null);
 const targetRef = ref(null);
 const moveableRef = ref(null);
 
-// Beim Mounten Daten laden
 onMounted(async () => {
   await fetchFramingInfo();
 
@@ -85,7 +69,7 @@ onMounted(async () => {
   const smallerDimension = Math.min(window.innerWidth, window.innerHeight - 200);
   const roundedDimension = Math.floor(smallerDimension / 100) * 100;
   framingStore.containerSize = roundedDimension;
-
+  setMinTargetFov();
   // Bild abrufen
   await getTargetPic();
 
@@ -94,23 +78,44 @@ onMounted(async () => {
   y.value = framingStore.containerSize / 2 - framingStore.camHeight / 2;
 
   await nextTick();
+  await new Promise((resolve) => setTimeout(resolve, 500));
   isLoading.value = false;
 });
 
+watch(
+  () => framingStore.rotationAngle,
+  () => {
+    console.log('debounceRotateRange:', framingStore.rotationAngle);
+    debounceRotateRange();
+  }
+);
+
+let debounceTimeout;
+function debounceRotateRange() {
+  clearTimeout(debounceTimeout);
+  debounceTimeout = setTimeout(() => {
+    rotateByRange();
+  }, 500); // Wartezeit in Millisekunden
+}
+function rotateByRange() {
+  const normalizedAngle = framingStore.rotationAngle % 360; // Sicherstellen, dass der Wert im Bereich 0-360 bleibt
+  moveableRef.value.request('rotatable', { rotate: normalizedAngle }, true);
+}
+
 // Methode, um Kamera-FOV und das verschiebbare Rechteck zu berechnen
-function calcCameraFov() {
+function calcCameraFov(fov) {
   const sensorWidthPx = framingStore.framingInfo.CameraWidth;
   const sensorHeightPx = framingStore.framingInfo.CameraHeight;
   const pixelSizeM = framingStore.framingInfo.CameraPixelSize / 1_000_000;
   const focalLengthM = framingStore.framingInfo.FocalLength / 1000;
 
-  scaleDegPerPixel.value = framingStore.fov / framingStore.containerSize;
+  scaleDegPerPixel.value = fov / framingStore.containerSize;
 
-  // Sensor-Größe in Meter
+  // Sensor-Größe
   const sensorWidthM = sensorWidthPx * pixelSizeM;
   const sensorHeightM = sensorHeightPx * pixelSizeM;
 
-  // Reales FOV in Grad
+  // FOV in Grad
   const fovX = 2 * rad2deg(Math.atan(sensorWidthM / 2 / focalLengthM));
   const fovY = 2 * rad2deg(Math.atan(sensorHeightM / 2 / focalLengthM));
 
@@ -120,6 +125,22 @@ function calcCameraFov() {
 
   framingStore.camWidth = fovPxX;
   framingStore.camHeight = fovPxY;
+}
+
+function setMinTargetFov() {
+  let fov = framingStore.fov;
+  calcCameraFov(fov);
+  console.log('setMinTargetFov ', fov);
+  while (framingStore.camWidth + 200 > framingStore.containerSize) {
+    fov += 1;
+    calcCameraFov(fov);
+    console.log('fov hochgesetzt:', framingStore.fov);
+    if (fov > 50) {
+      console.warn('Fov zu hoch, Abbruch!');
+      break;
+    }
+  }
+  framingStore.fov = fov; // Aktualisiere `framingStore.fov`
 }
 
 // Drag-Event von Moveable
@@ -138,19 +159,6 @@ function onDrag(e) {
   calculateRaDec();
 }
 
-/** Button-Klick: rotiert um +15° */
-function rotateBy15() {
-  // Sage Moveable: "rotatable" -> drehe um deltaRotate: 15 Grad
-  // Dritter Parameter 'true' = "ist ein 'isInstant' Request".
-  // Moveable kümmert sich um den transform und seine Bounding Box.
-  moveableRef.value.request('rotatable', { deltaRotate: 15 }, true);
-}
-
-function onRotate(e) {
-  e.target.style.transform = e.transform; // Das ist der von Moveable fertige transform-String
-  rotationAngle.value = e.beforeRotate; // Wenn du den Winkel trotzdem noch speichern willst
-}
-
 async function getTargetPic() {
   try {
     const ra = framingStore.RAangle;
@@ -158,9 +166,9 @@ async function getTargetPic() {
     const width = framingStore.containerSize;
     const height = framingStore.containerSize;
     const fov = framingStore.fov;
-    const useCache = framingStore.useNinaCache;
+    const useCache = settingsStore.framing.useNinaCache;
 
-    calcCameraFov();
+    calcCameraFov(framingStore.fov);
 
     if (targetPic.value) {
       URL.revokeObjectURL(targetPic.value);
@@ -254,7 +262,6 @@ function rad2deg(rad) {
   display: flex;
   justify-content: center;
   align-items: center;
-  /* Nur zum Testen, damit man den Rahmen sieht */
-  border: 2px dashed red;
+  border: 1px dashed red;
 }
 </style>

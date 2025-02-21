@@ -1,36 +1,44 @@
 import { defineStore } from 'pinia';
+import { apiStore } from '@/store/store';
+import { useFramingStore } from '@/store/framingStore';
+import { useSettingsStore } from './settingsStore';
 import { ref } from 'vue';
 
 export const useCameraStore = defineStore('cameraStore', () => {
-  // Reaktive Variablen
-  const exposureTime = ref(2);
+  const framingStore = useFramingStore();
+  const settingsStore = useSettingsStore();
+  const store = apiStore();
   const remainingExposureTime = ref(0);
   const progress = ref(0);
-  const imageData = ref(null); // Hier liegt später das Base64-Bild
+  const imageData = ref(null);
   const loading = ref(false);
   const isExposure = ref(false);
   const isLoadingImage = ref(false);
   const isLooping = ref(false);
   const isAbort = ref(false);
   const showInfo = ref(false);
-  const gain = ref(0);
-  const offset = ref(0);
   const coolingTemp = ref(-10);
   const coolingTime = ref(10);
   const warmingTime = ref(10);
   const buttonCoolerOn = ref(false);
+  const plateSolveError = ref(false);
+  const plateSolveResult = ref('');
+  const exposureCountdown = ref(0);
+  const exposureProgress = ref(0);
+  const countdownRunning = ref(false);
+  const binningMode = ref('1x1');
+  const readoutMode = ref(0);
+  const containerSize = ref(100);
+  const slewModal = ref(false);
+
   let exposureCountdownTimer = null;
 
-  /**
-   * Hilfsfunktion, um kurz zu warten
-   */
+  // Hilfsfunktion, um kurz zu warten
   function wait(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
-  /**
-   * Startet den Belichtungs-Countdown
-   */
+  // Startet den Belichtungs-Countdown
   function startExposureCountdown(totalTime) {
     // Hier gleich Promise zurückgeben, damit wir drauf warten können
     return new Promise((resolve, reject) => {
@@ -54,10 +62,8 @@ export const useCameraStore = defineStore('cameraStore', () => {
     });
   }
 
-  /**
-   * Startet die Aufnahme + Countdown + Bildabruf
-   */
-  async function capturePhoto(apiService, exposureTime, gain) {
+  // Startet die Aufnahme + Countdown + Bildabruf
+  async function capturePhoto(apiService, exposureTime, gain, solve = false) {
     if (exposureTime <= 0) {
       exposureTime = 2; // Default-Wert
       return;
@@ -72,7 +78,7 @@ export const useCameraStore = defineStore('cameraStore', () => {
 
     try {
       // Starte Aufnahme via API
-      const capturePromise = apiService.startCapture(exposureTime, gain);
+      const capturePromise = apiService.startCapture(exposureTime, gain, solve);
 
       // Countdown laufen lassen
       await startExposureCountdown(exposureTime);
@@ -90,9 +96,11 @@ export const useCameraStore = defineStore('cameraStore', () => {
 
       while (!image && attempts < maxAttempts && !isAbort.value) {
         try {
-          const result = await apiService.getCaptureResult();
+          const result = await apiService.getCaptureResult(settingsStore.camera.imageQuality);
           image = result?.Response?.Image;
           if (image) {
+            plateSolveResult.value = result?.Response?.PlateSolveResult;
+            console.log('Platesovle:', plateSolveResult.value);
             imageData.value = `data:image/jpeg;base64,${image}`;
             break;
           }
@@ -143,9 +151,84 @@ export const useCameraStore = defineStore('cameraStore', () => {
     }
   }
 
+  async function getCameraRotation(apiService, exposureTime = 2, gain) {
+    loading.value = true;
+    isLoadingImage.value = true;
+    progress.value = 0;
+    plateSolveError.value = false;
+
+    try {
+      // Starte Aufnahme via API
+      let result; // Deklaration der Variable result
+      let plateSolveResult = null;
+      let plateSolveStatusCode = 0;
+      isLoadingImage.value = true;
+      result = await apiService.getPlatesovle(exposureTime, gain);
+      console.log('result: ', result);
+
+      plateSolveResult = result?.Response?.PlateSolveResult;
+      plateSolveStatusCode = result?.StatusCode;
+      if (plateSolveStatusCode != 200) {
+        plateSolveError.value = true;
+        console.log('plateSolveError: ', plateSolveStatusCode, plateSolveError.value);
+      }
+      if (plateSolveResult) {
+        framingStore.rotationAngle = plateSolveResult.PositionAngle;
+        console.log('Camera position angle: ', framingStore.rotationAngle);
+      }
+    } catch (error) {
+      console.error('Fehler bei der Aufnahme:', error.message);
+    } finally {
+      loading.value = false;
+      isLoadingImage.value = false;
+    }
+  }
+
+  //Countdown für Statusanzeige
+  async function updateCountdown() {
+    const exposureEndTime = store.cameraInfo.ExposureEndTime;
+
+    if (!exposureEndTime) {
+      exposureCountdown.value = 0;
+      exposureProgress.value = 0;
+      return;
+    }
+
+    const endTime = new Date(exposureEndTime).getTime();
+    if (isNaN(endTime)) {
+      console.error('Ungültiges Datumsformat für ExposureEndTime.');
+      exposureCountdown.value = 0;
+      exposureProgress.value = 0;
+      return;
+    }
+
+    const durationTime = Math.floor((endTime - Date.now()) / 1000);
+    console.log('durationTime', durationTime);
+
+    countdownRunning.value = true;
+    while (countdownRunning.value) {
+      const now = Date.now();
+      let remainingTime = Math.floor((endTime - now) / 1000);
+
+      if (remainingTime <= 0 || !store.cameraInfo.IsExposing) {
+        exposureProgress.value = 100;
+        exposureCountdown.value = 0;
+        await new Promise((resolve) => setTimeout(resolve, 1000)); // 1 Sekunde warten
+        exposureProgress.value = 0;
+        countdownRunning.value = false;
+        remainingTime = 0;
+        break;
+      }
+
+      exposureCountdown.value = remainingTime;
+      console.log('exposureCountdown', exposureCountdown.value);
+      exposureProgress.value = Math.max(0, Math.min(100, (1 - remainingTime / durationTime) * 100));
+      //console.log('exposureProgress Fortschritt %:', exposureProgress.value);
+      await new Promise((resolve) => setTimeout(resolve, 1000)); // 1 Sekunde warten
+    }
+  }
+
   return {
-    // State
-    exposureTime,
     remainingExposureTime,
     progress,
     imageData,
@@ -155,15 +238,24 @@ export const useCameraStore = defineStore('cameraStore', () => {
     isLooping,
     isAbort,
     showInfo,
-    gain,
-    offset,
     coolingTemp,
     coolingTime,
     warmingTime,
     buttonCoolerOn,
+    plateSolveError,
+    plateSolveResult,
+    exposureCountdown,
+    exposureProgress,
+    countdownRunning,
+    binningMode,
+    readoutMode,
+    containerSize,
+    slewModal,
 
     // Actions
     capturePhoto,
+    getCameraRotation,
     abortExposure,
+    updateCountdown,
   };
 });

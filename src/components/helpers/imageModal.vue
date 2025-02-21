@@ -4,7 +4,7 @@
     <!-- Halbtransparenter Overlay-Hintergrund -->
     <div class="absolute inset-0 bg-black bg-opacity-70" @click="closeModal"></div>
     <div v-if="isLoading">
-      <!--Spinner-->
+      <!-- Spinner -->
       <div class="flex items-center justify-center w-full h-full">
         <div
           class="w-12 h-12 border-4 border-blue-500 border-t-transparent border-solid rounded-full animate-spin"
@@ -14,12 +14,20 @@
     <!-- Inhalt der Modal -->
     <div v-else class="relative w-full h-full bg-gray-900 z-60 flex items-center justify-center">
       <button
-        class="absolute top-4 right-4 text-white hover:text-gray-300 text-2xl font-extrabold z-70"
+        class="absolute rounded-full h-7 w-7 shadow-lg shadow-black flex justify-center items-center bg-gray-800 top-4 right-4 text-white hover:text-gray-300 text-2xl font-extrabold z-70"
         @click="closeModal"
         aria-label="Schließen"
       >
         ✕
       </button>
+
+      <!-- Zoom Overlay -->
+      <div
+        class="absolute top-4 left-4 shadow-lg shadow-black bg-gray-800 text-white text-sm px-3 py-1 rounded-lg z-[100] pointer-events-none"
+      >
+        Zoom: {{ zoomLevel.toFixed(2) }}x
+      </div>
+
       <div
         ref="imageContainer"
         class="w-full h-full overflow-hidden relative flex items-center justify-center shadow-md shadow-cyan-900"
@@ -38,11 +46,9 @@
 </template>
 
 <script setup>
-/* eslint-disable */
 import { ref, watch, nextTick, onBeforeUnmount } from 'vue';
 import Panzoom from 'panzoom';
 
-// Props definieren
 const props = defineProps({
   showModal: {
     type: Boolean,
@@ -58,37 +64,56 @@ const props = defineProps({
   },
 });
 
-// Emits definieren
 const emits = defineEmits(['close']);
+const image = ref(null);
+let panzoomInstance = null;
+const zoomLevel = ref(1);
+const originalWidth = ref(1);
+const originalHeight = ref(1);
+const currentWidth = ref(1);
+const currentHeight = ref(1);
 
-/**
- * Schließt die Modal, indem ein "close"-Event emittiert wird
- */
 function closeModal() {
   emits('close');
 }
 
-// Refs für Panzoom
-const image = ref(null);
-let panzoomInstance = null;
-
-/**
- * Initialisiert Panzoom auf dem Bild
- */
-const initializePanzoom = () => {
+const logZoomLevel = () => {
   if (image.value) {
-    panzoomInstance = Panzoom(image.value, {
-      maxZoom: 40,
-      minZoom: 0.5,
-      bounds: true,
-      boundsPadding: 0.5,
-    });
+    const { width, height } = image.value.getBoundingClientRect();
+    currentWidth.value = width;
+    currentHeight.value = height;
+
+    const zoomX = width / originalWidth.value;
+    const zoomY = height / originalHeight.value;
+    zoomLevel.value = Math.max(zoomX, zoomY);
   }
 };
 
-/**
- * Bereinigt die Panzoom-Instanz
- */
+const initializePanzoom = () => {
+  if (image.value) {
+    originalWidth.value = image.value.naturalWidth;
+    originalHeight.value = image.value.naturalHeight;
+
+    panzoomInstance = Panzoom(image.value, {
+      maxZoom: 40,
+      minZoom: 0.5,
+      contain: 'inside',
+      smoothScroll: true,
+    });
+
+    panzoomInstance.on('zoom', logZoomLevel);
+    logZoomLevel();
+
+    image.value.addEventListener(
+      'touchmove',
+      (event) => {
+        event.preventDefault();
+      },
+      { passive: false }
+    );
+  }
+};
+
 const destroyPanzoom = () => {
   if (panzoomInstance) {
     panzoomInstance.dispose();
@@ -96,37 +121,28 @@ const destroyPanzoom = () => {
   }
 };
 
-// Handler für das Laden des Bildes
 const onImageLoad = () => {
-  // Warte, bis das Bild vollständig geladen ist
   nextTick(() => {
-    destroyPanzoom(); // Vorherige Instanz bereinigen
-    initializePanzoom(); // Neue Instanz initialisieren
+    destroyPanzoom();
+    initializePanzoom();
   });
 };
 
-// Beobachte Änderungen an showModal, um Panzoom zu initialisieren oder zu bereinigen
 watch(
   () => props.showModal,
   (newVal) => {
-    if (newVal) {
-      // Wenn das Modal geöffnet wird, Panzoom initialisieren nach dem Laden des Bildes
-      // Der @load-Handler im img-Tag kümmert sich darum
-    } else {
-      // Wenn das Modal geschlossen wird, Panzoom bereinigen
+    if (!newVal) {
       destroyPanzoom();
     }
   }
 );
 
-// Bereinige Panzoom-Instanz, wenn die Komponente zerstört wird
 onBeforeUnmount(() => {
   destroyPanzoom();
 });
 </script>
 
 <style scoped>
-/* Sicherstellen, dass der Modal-Container die volle Fläche nutzt */
 .modal-container {
   display: flex;
   align-items: center;
@@ -135,7 +151,6 @@ onBeforeUnmount(() => {
   height: 100%;
 }
 
-/* Bild-Container */
 .image-container {
   overflow: hidden;
   width: 100%;
@@ -146,7 +161,6 @@ onBeforeUnmount(() => {
   justify-content: center;
 }
 
-/* Bild selbst */
 .image-container img {
   width: 100%;
   height: 100%;
@@ -154,7 +168,6 @@ onBeforeUnmount(() => {
   cursor: move;
 }
 
-/* Schließen-Button spezifische Stile */
 button[aria-label='Schließen'] {
   z-index: 70;
 }

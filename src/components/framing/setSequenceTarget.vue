@@ -65,10 +65,10 @@ async function setSequenceTarget() {
   const name = framingStore.selectedItem.Name;
   const ra = framingStore.RAangle;
   const dec = framingStore.DECangle;
-  const rotation = 0;
+  const rotation = framingStore.rotationAngle;
   const index = 0;
 
-  console.log('Name:', name, 'RA:', ra, 'Dec:', dec);
+  console.log('Name:', name, 'RA:', ra, 'Dec:', dec, 'Rotation:', rotation);
 
   if (!store.sequenceIsLoaded) {
     console.error('No sequence loaded');
