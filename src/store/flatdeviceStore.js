@@ -1,8 +1,9 @@
-import { defineStore } from 'pinia';
+import create from 'zustand';
 
-export const useFlatStore = defineStore('flatStore', {
-  state: () => ({
-    brightness: 100,
-  }),
-  actions: {},
-});
+const useFlatStore = create((set) => ({
+  brightness: 100,
+
+  setBrightness: (newBrightness) => set({ brightness: newBrightness }),
+}));
+
+export default useFlatStore;

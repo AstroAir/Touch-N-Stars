@@ -1,261 +1,202 @@
-import { defineStore } from 'pinia';
-import { apiStore } from '@/store/store';
-import { useFramingStore } from '@/store/framingStore';
-import { useSettingsStore } from './settingsStore';
-import { ref } from 'vue';
+import create from 'zustand';
 
-export const useCameraStore = defineStore('cameraStore', () => {
-  const framingStore = useFramingStore();
-  const settingsStore = useSettingsStore();
-  const store = apiStore();
-  const remainingExposureTime = ref(0);
-  const progress = ref(0);
-  const imageData = ref(null);
-  const loading = ref(false);
-  const isExposure = ref(false);
-  const isLoadingImage = ref(false);
-  const isLooping = ref(false);
-  const isAbort = ref(false);
-  const showInfo = ref(false);
-  const coolingTemp = ref(-10);
-  const coolingTime = ref(10);
-  const warmingTime = ref(10);
-  const buttonCoolerOn = ref(false);
-  const plateSolveError = ref(false);
-  const plateSolveResult = ref('');
-  const exposureCountdown = ref(0);
-  const exposureProgress = ref(0);
-  const countdownRunning = ref(false);
-  const binningMode = ref('1x1');
-  const readoutMode = ref(0);
-  const containerSize = ref(100);
-  const slewModal = ref(false);
+const useCameraStore = create((set, get) => ({
+  remainingExposureTime: 0,
+  progress: 0,
+  imageData: null,
+  loading: false,
+  isExposure: false,
+  isLoadingImage: false,
+  isLooping: false,
+  isAbort: false,
+  showInfo: false,
+  coolingTemp: -10,
+  coolingTime: 10,
+  warmingTime: 10,
+  buttonCoolerOn: false,
+  plateSolveError: false,
+  plateSolveResult: '',
+  exposureCountdown: 0,
+  exposureProgress: 0,
+  countdownRunning: false,
+  binningMode: '1x1',
+  readoutMode: 0,
+  containerSize: 100,
+  slewModal: false,
 
-  let exposureCountdownTimer = null;
+  wait: (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
 
-  // Hilfsfunktion, um kurz zu warten
-  function wait(ms) {
-    return new Promise((resolve) => setTimeout(resolve, ms));
-  }
-
-  // Startet den Belichtungs-Countdown
-  function startExposureCountdown(totalTime) {
-    // Hier gleich Promise zurückgeben, damit wir drauf warten können
+  startExposureCountdown: (totalTime) => {
     return new Promise((resolve, reject) => {
-      exposureCountdownTimer = setInterval(() => {
-        // Abbruch?
-        if (!isExposure.value) {
-          clearInterval(exposureCountdownTimer);
-          reject(new Error('Belichtung wurde abgebrochen.'));
+      const intervalId = setInterval(() => {
+        const { isExposure, remainingExposureTime, progress } = get();
+        if (!isExposure) {
+          clearInterval(intervalId);
+          reject(new Error('Exposure was aborted.'));
           return;
         }
 
-        remainingExposureTime.value--;
-        progress.value = ((totalTime - remainingExposureTime.value) / totalTime) * 100;
+        set((state) => ({
+          remainingExposureTime: state.remainingExposureTime - 1,
+          progress: ((totalTime - state.remainingExposureTime) / totalTime) * 100,
+        }));
 
-        if (remainingExposureTime.value <= 0) {
-          clearInterval(exposureCountdownTimer);
-          progress.value = 100;
-          resolve(); // Countdown fertig
+        if (remainingExposureTime <= 0) {
+          clearInterval(intervalId);
+          set({ progress: 100 });
+          resolve();
         }
       }, 1000);
     });
-  }
+  },
 
-  // Startet die Aufnahme + Countdown + Bildabruf
-  async function capturePhoto(apiService, exposureTime, gain, solve = false) {
+  capturePhoto: async (apiService, exposureTime, gain, solve = false) => {
     if (exposureTime <= 0) {
-      exposureTime = 2; // Default-Wert
+      exposureTime = 2;
       return;
     }
-    loading.value = true;
-    isExposure.value = true;
-    isLoadingImage.value = false;
-    isAbort.value = false;
-    remainingExposureTime.value = exposureTime;
-    progress.value = 0;
-    //console.log(gain);
+
+    set({
+      loading: true,
+      isExposure: true,
+      isLoadingImage: false,
+      isAbort: false,
+      remainingExposureTime: exposureTime,
+      progress: 0,
+    });
 
     try {
-      // Starte Aufnahme via API
       const capturePromise = apiService.startCapture(exposureTime, gain, solve);
-
-      // Countdown laufen lassen
-      await startExposureCountdown(exposureTime);
-
-      // Warte, bis API-Aufnahme fertig ist
+      await get().startExposureCountdown(exposureTime);
       await capturePromise;
 
-      // Jetzt Bild holen
-      isExposure.value = false;
-      isLoadingImage.value = true;
+      set({ isExposure: false, isLoadingImage: true });
 
       let attempts = 0;
       const maxAttempts = 60;
       let image = null;
 
-      while (!image && attempts < maxAttempts && !isAbort.value) {
+      while (!image && attempts < maxAttempts && !get().isAbort) {
         try {
-          const result = await apiService.getCaptureResult(settingsStore.camera.imageQuality);
+          const result = await apiService.getCaptureResult(get().settingsStore.camera.imageQuality);
           image = result?.Response?.Image;
           if (image) {
-            plateSolveResult.value = result?.Response?.PlateSolveResult;
-            console.log('Platesovle:', plateSolveResult.value);
-            imageData.value = `data:image/jpeg;base64,${image}`;
+            set({
+              plateSolveResult: result?.Response?.PlateSolveResult,
+              imageData: `data:image/jpeg;base64,${image}`,
+            });
             break;
           }
         } catch (error) {
-          console.error('Fehler beim Abrufen des Bildes:', error.message);
+          console.error('Error fetching image:', error.message);
         }
         attempts++;
-        await wait(1000);
+        await get().wait(1000);
       }
 
-      // Wenn bis hier kein Bild und kein Abbruch
-      if (!image && !isAbort.value) {
+      if (!image && !get().isAbort) {
         alert('Image was not provided in time');
       }
     } catch (error) {
-      console.error('Fehler bei der Aufnahme:', error.message);
+      console.error('Error during capture:', error.message);
     } finally {
-      loading.value = false;
-      isLoadingImage.value = false;
-      // Dauerschleife?
-      if (isLooping.value) {
-        capturePhoto(apiService, exposureTime, gain);
+      set({ loading: false, isLoadingImage: false });
+      if (get().isLooping) {
+        get().capturePhoto(apiService, exposureTime, gain);
       }
     }
-  }
+  },
 
-  /**
-   * Bricht die Belichtung ab
-   */
-  async function abortExposure(apiService) {
+  abortExposure: async (apiService) => {
     try {
-      console.log('Abbruch der Belichtung gestartet...');
+      console.log('Aborting exposure...');
       await apiService.cameraAction('abort-exposure');
-      clearInterval(exposureCountdownTimer);
+      clearInterval(get().exposureCountdownTimer);
 
-      isAbort.value = true;
-      isExposure.value = false;
-      isLoadingImage.value = false;
-      isLooping.value = false;
-      remainingExposureTime.value = 0;
-      progress.value = 0;
+      set({
+        isAbort: true,
+        isExposure: false,
+        isLoadingImage: false,
+        isLooping: false,
+        remainingExposureTime: 0,
+        progress: 0,
+      });
 
-      console.log('Belichtung erfolgreich abgebrochen.');
+      console.log('Exposure successfully aborted.');
     } catch (error) {
-      console.error('Fehler beim Abbrechen der Belichtung:', error);
+      console.error('Error aborting exposure:', error);
     } finally {
-      loading.value = false;
+      set({ loading: false });
     }
-  }
+  },
 
-  async function getCameraRotation(apiService, exposureTime = 2, gain) {
-    loading.value = true;
-    isLoadingImage.value = true;
-    progress.value = 0;
-    plateSolveError.value = false;
+  getCameraRotation: async (apiService, exposureTime = 2, gain) => {
+    set({ loading: true, isLoadingImage: true, progress: 0, plateSolveError: false });
 
     try {
-      // Starte Aufnahme via API
-      let result; // Deklaration der Variable result
+      let result;
       let plateSolveResult = null;
       let plateSolveStatusCode = 0;
-      isLoadingImage.value = true;
+      set({ isLoadingImage: true });
       result = await apiService.getPlatesovle(exposureTime, gain);
       console.log('result: ', result);
 
       plateSolveResult = result?.Response?.PlateSolveResult;
       plateSolveStatusCode = result?.StatusCode;
       if (plateSolveStatusCode != 200) {
-        plateSolveError.value = true;
-        console.log('plateSolveError: ', plateSolveStatusCode, plateSolveError.value);
+        set({ plateSolveError: true });
+        console.log('plateSolveError: ', plateSolveStatusCode, get().plateSolveError);
       }
       if (plateSolveResult) {
-        framingStore.rotationAngle = plateSolveResult.PositionAngle;
-        console.log('Camera position angle: ', framingStore.rotationAngle);
+        get().framingStore.setState({ rotationAngle: plateSolveResult.PositionAngle });
+        console.log('Camera position angle: ', get().framingStore.rotationAngle);
       }
     } catch (error) {
-      console.error('Fehler bei der Aufnahme:', error.message);
+      console.error('Error during capture:', error.message);
     } finally {
-      loading.value = false;
-      isLoadingImage.value = false;
+      set({ loading: false, isLoadingImage: false });
     }
-  }
+  },
 
-  //Countdown für Statusanzeige
-  async function updateCountdown() {
-    const exposureEndTime = store.cameraInfo.ExposureEndTime;
+  updateCountdown: async () => {
+    const { cameraInfo } = get().store;
+    const exposureEndTime = cameraInfo.ExposureEndTime;
 
     if (!exposureEndTime) {
-      exposureCountdown.value = 0;
-      exposureProgress.value = 0;
+      set({ exposureCountdown: 0, exposureProgress: 0 });
       return;
     }
 
     const endTime = new Date(exposureEndTime).getTime();
     if (isNaN(endTime)) {
-      console.error('Ungültiges Datumsformat für ExposureEndTime.');
-      exposureCountdown.value = 0;
-      exposureProgress.value = 0;
+      console.error('Invalid date format for ExposureEndTime.');
+      set({ exposureCountdown: 0, exposureProgress: 0 });
       return;
     }
 
     const durationTime = Math.floor((endTime - Date.now()) / 1000);
     console.log('durationTime', durationTime);
 
-    countdownRunning.value = true;
-    while (countdownRunning.value) {
+    set({ countdownRunning: true });
+    while (get().countdownRunning) {
       const now = Date.now();
       let remainingTime = Math.floor((endTime - now) / 1000);
 
-      if (remainingTime <= 0 || !store.cameraInfo.IsExposing) {
-        exposureProgress.value = 100;
-        exposureCountdown.value = 0;
-        await new Promise((resolve) => setTimeout(resolve, 1000)); // 1 Sekunde warten
-        exposureProgress.value = 0;
-        countdownRunning.value = false;
+      if (remainingTime <= 0 || !cameraInfo.IsExposing) {
+        set({ exposureProgress: 100, exposureCountdown: 0 });
+        await get().wait(1000);
+        set({ exposureProgress: 0, countdownRunning: false });
         remainingTime = 0;
         break;
       }
 
-      exposureCountdown.value = remainingTime;
-      console.log('exposureCountdown', exposureCountdown.value);
-      exposureProgress.value = Math.max(0, Math.min(100, (1 - remainingTime / durationTime) * 100));
-      //console.log('exposureProgress Fortschritt %:', exposureProgress.value);
-      await new Promise((resolve) => setTimeout(resolve, 1000)); // 1 Sekunde warten
+      set({
+        exposureCountdown: remainingTime,
+        exposureProgress: Math.max(0, Math.min(100, (1 - remainingTime / durationTime) * 100)),
+      });
+      await get().wait(1000);
     }
-  }
+  },
+}));
 
-  return {
-    remainingExposureTime,
-    progress,
-    imageData,
-    loading,
-    isExposure,
-    isLoadingImage,
-    isLooping,
-    isAbort,
-    showInfo,
-    coolingTemp,
-    coolingTime,
-    warmingTime,
-    buttonCoolerOn,
-    plateSolveError,
-    plateSolveResult,
-    exposureCountdown,
-    exposureProgress,
-    countdownRunning,
-    binningMode,
-    readoutMode,
-    containerSize,
-    slewModal,
-
-    // Actions
-    capturePhoto,
-    getCameraRotation,
-    abortExposure,
-    updateCountdown,
-  };
-});
+export default useCameraStore;

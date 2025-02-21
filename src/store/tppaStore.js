@@ -1,33 +1,28 @@
-import { defineStore } from 'pinia';
+import create from 'zustand';
 
-export const useTppaStore = defineStore('tppaStore', {
-  state: () => ({
-    lastMessage: null,
-    status: 'nicht verbunden',
-    isConnected: false,
-    currentMessage: null,
-    isRunning: false,
-    initialized: false,
-  }),
+const useTppaStore = create((set) => ({
+  lastMessage: null,
+  status: 'nicht verbunden',
+  isConnected: false,
+  currentMessage: null,
+  isRunning: false,
+  initialized: false,
 
-  actions: {
-    setRunning(isRunning) {
-      this.isRunning = isRunning;
-      // Persist state to localStorage
-      localStorage.setItem('tppaStore', JSON.stringify(this.$state));
-    },
-    initialize() {
-      if (!this.initialized) {
-        const savedState = localStorage.getItem('tppaStore');
-        if (savedState) {
-          this.$state = JSON.parse(savedState);
-        }
-        this.initialized = true;
+  setRunning: (isRunning) => {
+    set({ isRunning });
+    // Persist state to localStorage
+    localStorage.setItem('tppaStore', JSON.stringify(get().$state));
+  },
+
+  initialize: () => {
+    if (!get().initialized) {
+      const savedState = localStorage.getItem('tppaStore');
+      if (savedState) {
+        set(JSON.parse(savedState));
       }
-    },
+      set({ initialized: true });
+    }
   },
+}));
 
-  getters: {
-    isTppaRunning: (state) => state.isRunning,
-  },
-});
+export default useTppaStore;
