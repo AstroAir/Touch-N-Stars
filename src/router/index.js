@@ -1,19 +1,19 @@
-import { createRouter, createWebHistory } from 'vue-router';
-import StartPage from '@/views/StartPage.vue';
-import EquipmentPage from '@/views/EquipmentPage.vue';
-import CameraPage from '@/views/CameraPage.vue';
-import FocusPage from '@/views/FocusPage.vue';
-import MountPage from '@/views/MountPage.vue';
-import GuidingPage from '@/views/GuidingPage.vue';
-import LastLogs from '@/components/LastLogs.vue';
-import SequencePage from '@/views/SequencePage.vue';
-import DomePage from '@/views/DomePage.vue';
-import SettingsPage from '@/views/SettingsPage.vue';
-import FlatdevicePage from '@/views/FlatdevicePage.vue';
-import SequenceMonitoring from '@/views/SequenceMonitoring.vue';
-import SetupPage from '@/views/SetupPage.vue';
-import SwitchPage from '@/views/SwitchPage.vue';
-import Flatassistant from '@/views/FlatassistantPage.vue';
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import StartPage from '@/views/StartPage';
+import EquipmentPage from '@/views/EquipmentPage';
+import CameraPage from '@/views/CameraPage';
+import FocusPage from '@/views/FocusPage';
+import MountPage from '@/views/MountPage';
+import GuidingPage from '@/views/GuidingPage';
+import LastLogs from '@/components/LastLogs';
+import SequencePage from '@/views/SequencePage';
+import DomePage from '@/views/DomePage';
+import SettingsPage from '@/views/SettingsPage';
+import FlatdevicePage from '@/views/FlatdevicePage';
+import SequenceMonitoring from '@/views/SequenceMonitoring';
+import SetupPage from '@/views/SetupPage';
+import SwitchPage from '@/views/SwitchPage';
+import Flatassistant from '@/views/FlatassistantPage';
 import { useSettingsStore } from '@/store/settingsStore';
 
 const routes = [
